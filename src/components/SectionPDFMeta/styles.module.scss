@@ -1,0 +1,47 @@
+.section {
+  border-radius: var(--pico-border-radius);
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  display: flex;
+  flex-wrap: wrap;
+  background: var(--pico-background-color);
+  color: var(--pico-color);
+  overflow: hidden;
+}
+
+.optionsContainer {
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  padding: var(--pico-spacing);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+  flex: 1 0 300px;
+
+  .optionsItem {
+    display: grid;
+    grid-template: auto / 1fr 2fr;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .optionsItemUnit {
+    display: grid;
+    grid-template: auto / 1fr 1fr 1fr;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  label,
+  input,
+  select,
+  textarea,
+  button {
+    display: block;
+    margin: 0 !important;
+  }
+}
+
+.viewContainer {
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  padding: var(--pico-spacing);
+  flex: 1 1 600px;
+}

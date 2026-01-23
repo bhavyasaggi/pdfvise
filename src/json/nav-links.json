@@ -1,0 +1,107 @@
+[
+	{
+		"label": "Modify PDF",
+		"links": [
+			{
+				"href": "/pdf-merge",
+				"label": "Merge PDF",
+				"description": "Merge multiple PDF files together.",
+				"icon": "minimize-2"
+			},
+			{
+				"href": "/pdf-break",
+				"label": "Break PDF",
+				"description": "Break PDF to individual Pages.",
+				"icon": "external-link"
+			},
+			{
+				"href": "/pdf-flatten",
+				"label": "Flatten PDF",
+				"description": "Flatten PDF Forms",
+				"icon": "log-in"
+			},
+			{
+				"href": "/pdf-add-margin",
+				"label": "Add PDF Margin",
+				"description": "Add Margin to all PDF Pages.",
+				"icon": "maximize"
+			},
+			{
+				"href": "/pdf-edit-metadata",
+				"label": "Edit PDF Metadata",
+				"description": "Edit Metadata of PDF file.",
+				"icon": "edit-2"
+			},
+			{
+				"href": "/pdf-remove-metadata",
+				"label": "Remove PDF Metadata",
+				"description": "Remove Metadata of PDF file.",
+				"icon": "edit-3"
+			},
+			{
+				"href": "/pdf-resize",
+				"label": "Resize PDF",
+				"description": "Resize PDF to Custom Dimensions",
+				"icon": "maximize-2"
+			},
+			{
+				"href": "/pdf-rotate",
+				"label": "Rotate PDF",
+				"description": "Rotate entire PDF file or multiple PDF files together.",
+				"icon": "refresh-cw"
+			}
+		]
+	},
+	{
+		"label": "Manipulate PDF",
+		"links": [
+			{
+				"href": "/pdf-combine-pages",
+				"label": "Combine PDF Pages",
+				"description": "Crop & Stitch sections from multiple pages together.",
+				"icon": "log-in"
+			},
+			{
+				"href": "/pdf-extract-pages",
+				"label": "Extract PDF Pages",
+				"description": "Extract all Pages from a PDF file.",
+				"icon": "log-out"
+			},
+			{
+				"href": "/pdf-remove-pages",
+				"label": "Remove PDF Pages",
+				"description": "Remove multiple pages from a PDF file.",
+				"icon": "scissors"
+			},
+			{
+				"href": "/pdf-reorder-pages",
+				"label": "Reorder PDF Pages",
+				"description": "Reorder multiple or individual pages of a PDF file.",
+				"icon": "list"
+			},
+			{
+				"href": "/pdf-rotate-pages",
+				"label": "Rotate PDF Pages",
+				"description": "Rotate multiple or individual pages of a PDF file.",
+				"icon": "refresh-cw"
+			}
+		]
+	},
+	{
+		"label": "Misc.",
+		"links": [
+			{
+				"href": "/extract-images-from-pdf",
+				"label": "Extract PDF Text",
+				"description": "Extract all Text from a PDF file.",
+				"icon": "align-left"
+			},
+			{
+				"href": "/extract-images-from-pdf",
+				"label": "Extract PDF Images",
+				"description": "Extract all Images from a PDF file.",
+				"icon": "image"
+			}
+		]
+	}
+]

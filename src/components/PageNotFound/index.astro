@@ -1,0 +1,24 @@
+---
+import Image from "astro/components/Image.astro";
+import ASSET_404 from "@/assets/404.svg?url";
+---
+
+<section class="container" style="padding: calc(3 * var(--pico-spacing)) 0;">
+  <div style="text-align: center;">
+    <h1 style={{ color: "var(--pico-primary)" }}>Page Not Found</h1>
+    <a href="/">
+      Seems like you have lost your way.
+      <br />
+      Let's bring you back.
+    </a>
+    <br />
+    <Image
+      loading="eager"
+      src={ASSET_404}
+      alt="404"
+      height={192}
+      width={353}
+      style="margin: calc(2 * var(--pico-spacing)) 0;"
+    />
+  </div>
+</section>

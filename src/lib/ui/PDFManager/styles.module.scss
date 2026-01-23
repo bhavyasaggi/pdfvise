@@ -1,0 +1,110 @@
+.formContainer {
+
+  .formButton {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+    overflow: hidden;
+  }
+}
+
+.cardViewItemGroup {
+  text-align: center;
+  line-height: 1;
+}
+
+.cardViewItem {
+  display: inline-block;
+  width: 148px;
+  height: 212px;
+  margin: 4px;
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  padding: calc(0.4 * var(--pico-spacing));
+  box-shadow: var(--pico-box-shadow);
+  line-height: 1;
+  overflow: hidden;
+}
+
+.cardViewItemHeaderGroup {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: calc(0.4 * var(--pico-spacing));
+  font-size: 0.875em;
+  color: var(--pico-muted-color);
+  user-select: none;
+}
+
+.cardViewItemHeaderIcon {
+  flex: 0 0 auto;
+}
+
+.cardViewItemHeader {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cardViewItemThumbnailFigure {
+  position: relative;
+  margin: calc(0.4 * var(--pico-spacing)) auto;
+  border-width: var(--pico-border-width) 0;
+  border-color: var(--pico-muted-border-color);
+  border-style: solid;
+  padding: calc(0.4 * var(--pico-spacing)) 0;
+  color: var(--pico-muted-border-color);
+  overflow: hidden;
+
+  &:hover,
+  &:active,
+  &:focus-within {
+    .cardViewItemThumbnailFigureCaption {
+      display: block;
+    }
+  }
+}
+
+.cardViewItemThumbnailFigureCaption {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: var(--pico-border-radius);
+  padding: calc(0.2 * var(--pico-spacing));
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.8);
+  color: var(--pico-muted-color);
+  user-select: none;
+  pointer-events: none;
+}
+
+.cardViewItemThumbnail {
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  transition: transform .2s linear;
+}
+
+.cardViewItemButtonGroup {
+  display: grid;
+  grid-template: auto / repeat(4, 1fr);
+  gap: calc(0.2 * var(--pico-spacing));
+}
+
+.cardViewItemButton {
+  padding: calc(0.2 * var(--pico-spacing)) calc(0.4 * var(--pico-spacing)) !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.cardViewItemButtonDel {
+  --pico-color: var(--pico-del-color) !important;
+  --pico-border-color: var(--pico-del-color) !important;
+}

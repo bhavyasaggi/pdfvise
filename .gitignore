@@ -1,0 +1,53 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+.yarn
+
+# Production
+storybook-static
+coverage
+build
+dist
+out
+
+# Serwist
+**/*/public/sw*
+**/*/public/swe-worker*
+
+# Generated files
+.docusaurus
+.cache-loader
+.cache
+.astro
+.next
+.react-router
+.branches
+.temp
+
+# misc
+.Trashes
+.DS_Store
+Thumbs.db
+Desktop.ini
+desktop.ini
+__MACOSX
+.Spotlight-V100
+*.pem
+
+# debug
+*.log*
+
+# local env files
+.env.keys
+.env.local
+.env.*.local
+.env*.local
+.env
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts

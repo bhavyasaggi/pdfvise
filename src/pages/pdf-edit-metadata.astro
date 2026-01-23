@@ -1,0 +1,50 @@
+---
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
+import SectionPDFMetaLazy from "@/components/SectionPDFMeta/lazy";
+import SectionRibbon from "@/components/SectionRibbon/index.astro";
+import BaseLayout from "@/layouts/base.astro";
+---
+
+<BaseLayout
+  title="Edit PDF Metadata online for free. | PDFvise"
+  description="Edit PDF Metadata online without uploading, with no watermarks, & completely free! Edit PDF files easily on your browser only!."
+>
+  <SectionRibbon
+    title="Edit PDF Metadata"
+    description="Edit Metadata of PDF files."
+  />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionPDFMetaLazy client:load />
+    </div>
+    <SectionHowTo
+      title="How to Edit metadata of a PDF file?"
+      description="Edit PDF Metadata online without uploading, with no watermarks, & completely free! Edit PDF files easily on your browser only!."
+    >
+      <ol>
+        <li>Select all PDF files</li>
+        <li>Re-order, Rotate, or Remove your files</li>
+        <li>Save & Download</li>
+      </ol>
+    </SectionHowTo>
+    <section class="container">
+      <h2 style="text-align: center; color: var(--pico-primary);">
+        Frequently Asked Questions
+      </h2>
+      <details open>
+        <summary>
+          <strong
+            >Can I Rotate a PDF while editing Metadata of a PDF file?
+          </strong>
+        </summary>
+        <p>
+          After selecting a PDF file on PDFvise, you can choose to rotate the
+          file by 90°, 180°, or 270°.
+        </p>
+      </details>
+    </section>
+  </div>
+</BaseLayout>

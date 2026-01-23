@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1084 322">
+  <defs>
+    <pattern id="pid-0.9754548436499859" x="0" y="0" width="256" height="256" patternUnits="userSpaceOnUse">
+      <g transform="scale(1)">
+        <defs>
+          <g id="stripe-0.500929723637163">
+            <path d="M256 -128 L384 -128 L-128 384 L-128 256 Z" fill="#da2f47"></path>
+            <path d="M384 0 L384 128 L128 384 L0 384 Z" fill="#da2f47"></path>
+          </g>
+        </defs>
+
+        <g>
+          <use xlink:href="#stripe-0.500929723637163" x="-256" y="0"></use>
+          <use xlink:href="#stripe-0.500929723637163" x="0" y="0"></use>
+          <animateTransform attributeName="transform" type="translate" keyTimes="0;1" repeatCount="indefinite" dur="2s" values="0 0; 256 0"></animateTransform>
+        </g>
+      </g>
+    </pattern>
+  </defs>
+  <rect x="0" y="0" width="1084" height="322" fill="url(#pid-0.9754548436499859)"></rect>
+</svg>

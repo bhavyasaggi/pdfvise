@@ -1,0 +1,75 @@
+---
+import "@/styles/global.scss";
+import Image from "astro/components/Image.astro";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title || "PDFvise"}</title>
+    <meta name="description" content={description || ""} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+  </head>
+  <body>
+    <header>
+      <div class="container" style="display: flex; flex-wrap: nowrap;">
+        <a href="/" aria-label="Home" style="display: flex;">
+          <Image
+            src="/logo.png"
+            loading="eager"
+            alt="PDFvise Logo"
+            width={128}
+            height={32}
+          /></a
+        >
+      </div>
+    </header>
+    <main style="min-height: 100dvh; background-color: #fefbf8;">
+      <slot />
+    </main>
+    <footer style="padding: calc(2 * var(--pico-spacing)) 0; ">
+      <div
+        class="container"
+        style="display: flex; flex-direction: row; flex-wrap: wrap; gap: var(--pico-spacing); justify-content: space-between;"
+      >
+        <div>
+          <Image
+            src="/logo.png"
+            loading="lazy"
+            alt="PDFvise Logo"
+            width={96}
+            height={24}
+          />
+          <br />
+          <small>
+            © 20XX PDFvise. All rights reserved.
+            <br />
+            This software is licensed under the{" "}
+            <a
+              href="https://www.gnu.org/licenses/agpl-3.0.en.html"
+              class="contrast"
+            >
+              GNU Affero General Public License v3.0
+            </a>
+          </small>
+        </div>
+        <div style="margin-left: auto; text-align: right;">
+          <div style="min-height: 32px">
+            <strong>Important Links</strong>
+          </div>
+          <small>
+            <a href="/privacy-policy" class="secondary"> Privacy Policy </a>
+          </small>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

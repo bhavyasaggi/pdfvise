@@ -1,0 +1,283 @@
+@use "@picocss/pico/scss/colors" as *;
+
+@use "@picocss/pico/scss/pico" with ( // amber, azure, blue, cyan, fuchsia, green, grey, indigo, jade, lime, orange, pink, pumpkin, purple, red, sand, slate, violet, yellow, zinc
+  $theme-color: "red",
+  $css-var-prefix: "--pico-",
+  $semantic-root-element: "body",
+  $enable-semantic-container: false,
+  $enable-viewport: true,
+  $enable-responsive-spacings: false,
+  $enable-responsive-typography: false,
+  $enable-classes: true,
+  $enable-transitions: false,
+  $enable-important: false,
+  $parent-selector: "",
+  $breakpoints: (sm: null,
+    md: (breakpoint: 1024px, viewport: 950px, root-font-size: 100%),
+    lg: (breakpoint: 1280px, viewport: 1200px, root-font-size: 125%),
+    xl: null,
+    xxl: null,
+  ),
+  $modules: ( // Theme
+    "themes/default": false,
+
+    // Layout
+    "layout/document": true,
+    "layout/landmarks": false,
+    "layout/container": true,
+    "layout/section": false,
+    "layout/grid": false,
+    "layout/overflow-auto": false,
+
+    // Content
+    "content/link": true,
+    "content/typography": true,
+    "content/embedded": false,
+    "content/button": true,
+    "content/table": false,
+    "content/code": false,
+    "content/figure": false,
+    "content/misc": true,
+
+    // Forms
+    "forms/basics": true,
+    "forms/checkbox-radio-switch": false,
+    "forms/input-color": false,
+    "forms/input-date": false,
+    "forms/input-file": false,
+    "forms/input-range": false,
+    "forms/input-search": false,
+
+    // Components
+    "components/accordion": true,
+    "components/card": false,
+    "components/dropdown": false,
+    "components/group": false,
+    "components/loading": false,
+    "components/modal": false,
+    "components/nav": false,
+    "components/progress": false,
+    "components/tooltip": false,
+
+    // Utilities
+    "utilities/accessibility": true,
+    "utilities/reduce-motion": true));
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Montserrat'),
+    /* Chrome 26+, Opera 23+, Firefox 39+ */
+    url('/fonts/montserrat-v18-latin-regular.woff2') format('woff2'),
+    /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+    url('/fonts/montserrat-v18-latin-regular.woff') format('woff');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+  // ascent-override: 100%;
+  // descent-override: 100%;
+  // line-gap-override: 100%;
+  // size-adjust: 100%;
+}
+
+/**
+ * Styles
+ */
+:root,
+:host {
+  color-scheme: light;
+  --pico-background-color: #fff;
+  --pico-block-spacing-horizontal: var(--pico-spacing);
+  --pico-block-spacing-vertical: var(--pico-spacing);
+  --pico-blockquote-border-color: var(--pico-muted-border-color);
+  --pico-blockquote-footer-color: var(--pico-muted-color);
+  --pico-border-radius: 0; // 0.25rem;
+  --pico-border-width: 0.0625rem;
+  --pico-box-shadow: 0.0145rem 0.029rem 0.174rem rgba(129, 145, 181, 0.01698), 0.0335rem 0.067rem 0.402rem rgba(129, 145, 181, 0.024), 0.0625rem 0.125rem 0.75rem rgba(129, 145, 181, 0.03), 0.1125rem 0.225rem 1.35rem rgba(129, 145, 181, 0.036), 0.2085rem 0.417rem 2.502rem rgba(129, 145, 181, 0.04302), 0.5rem 1rem 6rem rgba(129, 145, 181, 0.06), 0 0 0 0.0625rem rgba(129, 145, 181, 0.015);
+  --pico-button-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  --pico-button-hover-box-shadow: 0 0 0 rgba(0, 0, 0, 0);
+  --pico-color: #373c44;
+  --pico-contrast-background: #181c25;
+  --pico-contrast-border: var(--pico-contrast-background);
+  --pico-contrast-focus: rgba(93, 107, 137, 0.25);
+  --pico-contrast-hover-background: #000;
+  --pico-contrast-hover-border: var(--pico-contrast-hover-background);
+  --pico-contrast-hover-underline: var(--pico-secondary-hover);
+  --pico-contrast-hover: #000;
+  --pico-contrast-inverse: #fff;
+  --pico-contrast-underline: rgba(24, 28, 37, 0.5);
+  --pico-contrast: #181c25;
+  --pico-del-color: rgb(136, 56.5, 53);
+  --pico-font-family-emoji: "Apple Color Emoji";
+  --pico-font-family-monospace: ui-monospace, Consolas, monospace, var(--pico-font-family-emoji);
+  --pico-font-family-sans-serif: "Montserrat", 'Helvetica Neue', Helvetica, Arial, system-ui, sans-serif, var(--pico-font-family-emoji);
+  --pico-font-family: var(--pico-font-family-sans-serif);
+  --pico-font-size: 100%;
+  --pico-font-weight: 400;
+  --pico-form-element-active-background-color: #fff;
+  --pico-form-element-active-border-color: var(--pico-primary-border);
+  --pico-form-element-background-color: rgb(251, 251.5, 252.25);
+  --pico-form-element-border-color: #cfd5e2;
+  --pico-form-element-color: #23262c;
+  --pico-form-element-disabled-opacity: 0.5;
+  --pico-form-element-focus-color: var(--pico-primary-border);
+  --pico-form-element-invalid-active-border-color: rgb(200.25, 79.25, 72.25);
+  --pico-form-element-invalid-border-color: rgb(183.5, 105.5, 106.5);
+  --pico-form-element-invalid-focus-color: var(--pico-form-element-invalid-active-border-color);
+  --pico-form-element-placeholder-color: var(--pico-muted-color);
+  --pico-form-element-selected-background-color: #dfe3eb;
+  --pico-form-element-spacing-horizontal: 0.8rem;
+  --pico-form-element-spacing-vertical: 0.3rem;
+  --pico-form-element-valid-active-border-color: rgb(39, 152.75, 118.75);
+  --pico-form-element-valid-border-color: rgb(76, 154.5, 137.5);
+  --pico-form-element-valid-focus-color: var(--pico-form-element-valid-active-border-color);
+  --pico-h1-color: #2d3138;
+  --pico-h2-color: #373c44;
+  --pico-h3-color: #424751;
+  --pico-h4-color: #4d535e;
+  --pico-h5-color: #5c6370;
+  --pico-h6-color: #646b79;
+  --pico-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgb(136, 145, 164)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  --pico-icon-invalid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgb(200.25, 79.25, 72.25)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cline x1='12' y1='8' x2='12' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'%3E%3C/line%3E%3C/svg%3E");
+  --pico-icon-valid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgb(76, 154.5, 137.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  --pico-ins-color: rgb(28.5, 105.5, 84);
+  --pico-line-height: 1.4;
+  --pico-mark-background-color: rgb(252.5, 230.5, 191.5);
+  --pico-mark-color: #0f1114;
+  --pico-muted-border-color: rgb(231, 234, 239.5);
+  --pico-muted-color: #646b79;
+  --pico-outline-width: 0.125rem;
+  --pico-primary-background: #da2f47;
+  --pico-primary-border: var(--pico-primary-background);
+  --pico-primary-focus: #ae2639;
+  --pico-primary-hover-background: #b9283c;
+  --pico-primary-hover-border: var(--pico-primary-hover-background);
+  --pico-primary-hover-underline: var(--pico-primary-hover);
+  --pico-primary-hover: #9b2318;
+  --pico-primary-inverse: #fff;
+  --pico-primary-underline: rgba(197, 47, 33, 0.5);
+  --pico-primary: #da2f47;
+  --pico-secondary-background: #525f7a;
+  --pico-secondary-border: var(--pico-secondary-background);
+  --pico-secondary-focus: rgba(93, 107, 137, 0.25);
+  --pico-secondary-hover-background: #48536b;
+  --pico-secondary-hover-border: var(--pico-secondary-hover-background);
+  --pico-secondary-hover-underline: var(--pico-secondary-hover);
+  --pico-secondary-hover: #48536b;
+  --pico-secondary-inverse: #fff;
+  --pico-secondary-underline: rgba(93, 107, 137, 0.5);
+  --pico-secondary: #5d6b89;
+  --pico-spacing: 1rem;
+  --pico-text-selection-color: rgba(240, 96, 72, 0.25);
+  --pico-text-underline-offset: 0.1rem;
+  --pico-transition: 0.2s ease-in-out;
+  --pico-typography-spacing-vertical: 1rem;
+}
+
+a {
+  --pico-text-decoration: underline;
+}
+
+a.secondary,
+a.contrast {
+  --pico-text-decoration: underline;
+}
+
+small {
+  --pico-font-size: 0.875em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  --pico-font-weight: 700;
+}
+
+h1 {
+  --pico-font-size: 2rem;
+  --pico-line-height: 1.125;
+  --pico-typography-spacing-top: 3rem;
+}
+
+h2 {
+  --pico-font-size: 1.75rem;
+  --pico-line-height: 1.15;
+  --pico-typography-spacing-top: 2.625rem;
+}
+
+h3 {
+  --pico-font-size: 1.5rem;
+  --pico-line-height: 1.175;
+  --pico-typography-spacing-top: 2.25rem;
+}
+
+h4,
+h5,
+h6 {
+  --pico-font-size: 1.25rem;
+  --pico-line-height: 1.2;
+  --pico-typography-spacing-top: 1.874rem;
+}
+
+input:not([type=submit],
+  [type=button],
+  [type=reset],
+  [type=checkbox],
+  [type=radio],
+  [type=file]),
+:where(select, textarea) {
+  --pico-outline-width: 0.0625rem;
+}
+
+input:is([type=submit],
+  [type=button],
+  [type=reset],
+  [type=checkbox],
+  [type=radio],
+  [type=file]) {
+  --pico-form-element-focus-color: var(--pico-primary-focus);
+}
+
+progress,
+[type=checkbox],
+[type=radio],
+[type=range] {
+  accent-color: var(--pico-primary);
+}
+
+body {
+  width: 100%;
+  margin: 0;
+
+  &>main,
+  &>header,
+  &>footer {
+    overflow: hidden;
+  }
+
+  &>header,
+  &>footer {
+    position: relative;
+    padding-block: var(--pico-block-spacing-vertical);
+    background-color: var(--pico-background-color);
+    box-shadow: var(--pico-box-shadow);
+  }
+}
+
+
+.hover {
+
+  &:hover,
+  &:focus-within {
+    filter: invert(0.04);
+
+    &:active {
+      filter: invert(0.08);
+    }
+  }
+}

@@ -1,0 +1,76 @@
+---
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
+import SectionPDFPagesLazy from "@/components/SectionPDFPages/lazy";
+import SectionRibbon from "@/components/SectionRibbon/index.astro";
+import BaseLayout from "@/layouts/base.astro";
+---
+
+<BaseLayout
+  title="Merge PDF files online for free. | PDFvise"
+  description="Merge PDF files online without uploading, with no watermarks, & completely free! Merge PDF files easily on your browser only!."
+>
+  <SectionRibbon title="Merge PDF" description="Merge multiple PDF files." />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionPDFPagesLazy client:load />
+    </div>
+    <SectionHowTo
+      title="How to merge multiple PDF files together?"
+      description="Merge PDF files online without uploading, with no watermarks, & completely free! Merge PDF files easily on your browser only!."
+    >
+      <ol>
+        <li>Select all PDF files</li>
+        <li>Re-order, Rotate, or Remove your files</li>
+        <li>Save & Download</li>
+      </ol>
+    </SectionHowTo>
+    <section class="container">
+      <h2 style="text-align: center; color: var(--pico-primary);">
+        Frequently Asked Questions
+      </h2>
+      <details open>
+        <summary>
+          <strong>How many PDF files I can merge at once with PDFvise?</strong>
+        </summary>
+        <p>
+          PDFvise can merge multiple files into one PDF without any limitation.
+          There is no size or count limit on PDF files to be merged.
+        </p>
+      </details>
+      <hr />
+      <details open>
+        <summary>
+          <strong>Can I merge PDF and rotate pages?</strong>
+        </summary>
+        <p>
+          After selecting multiple files, you can rotate all pages of the PDF on
+          PDFvise.
+        </p>
+      </details>
+      <hr />
+      <details open>
+        <summary>
+          <strong>Can I merge PDF and add margin?</strong>
+        </summary>
+        <p>
+          After selecting multiple files on PDFvise, you can add margins to all
+          pages of the PDF.
+        </p>
+      </details>
+      <hr />
+      <details open>
+        <summary>
+          <strong>Where are PDF files saved after merging?</strong>
+        </summary>
+        <p>
+          Respecting your privacy, PDFvise uploads no files to any secondary
+          location. All files are only available at your browser and your
+          system.
+        </p>
+      </details>
+    </section>
+  </div>
+</BaseLayout>

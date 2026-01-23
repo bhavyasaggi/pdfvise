@@ -1,0 +1,32 @@
+---
+import ASSET_TASKS from "@/assets/tasks.svg?url";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<section
+  style="display:flex; flex-wrap: wrap; justify-content: center; gap: var(--pico-spacing);"
+>
+  <img
+    loading="lazy"
+    src={ASSET_TASKS}
+    alt="Free"
+    width={380}
+    height={256}
+    style="flex: 0 0 380px"
+  />
+  <div style="flex: 1 1 380px">
+    <h2 style="color: var(--pico-primary);">
+      {title}
+    </h2>
+    <p>
+      {description}
+    </p>
+    <slot />
+  </div>
+</section>

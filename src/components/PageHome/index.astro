@@ -1,0 +1,267 @@
+---
+import type { FeatherIconNames } from "feather-icons";
+import ASSET_DEVICES from "@/assets/devices.svg?url";
+import ASSET_HERO from "@/assets/hero.svg?url";
+import ASSET_SECURE from "@/assets/secure.svg?url";
+import ASSET_STATS from "@/assets/stats.svg?url";
+import ASSET_WAITING from "@/assets/waiting.svg?url";
+import NAV_LINKS from "@/json/nav-links.json";
+import Icon from "@/lib/ui/Icon";
+
+import styles from "./styles.module.scss";
+
+type NavLinkItem = {
+  href: string;
+  icon: string;
+  label: string;
+  description: string;
+};
+
+type NavSection = {
+  label: string;
+  links: NavLinkItem[];
+};
+
+const NAV_LINKS_FLAT = (NAV_LINKS as NavSection[]).flatMap(
+  (item) => item.links
+);
+---
+
+<section
+  class="container"
+  style={{
+    display: "flex",
+    flexWrap: "wrap",
+    minHeight: "200px",
+    paddingTop: "var(--pico-spacing)",
+  }}
+>
+  <div style={{ maxWidth: "800px", alignSelf: "center", flex: "1 1 auto" }}>
+    <h1 style={{ color: "var(--pico-primary)" }}>Easy-to-use PDF tools</h1>
+    <p style={{ color: "var(--pico-muted-color)" }}>
+      PDFvise is all about convenience and transparency.
+      <br />
+      Find effective and simple PDF solutions in just a few steps.
+    </p>
+  </div>
+  <div
+    role="presentation"
+    style={{
+      marginLeft: "auto",
+      minWidth: "72px",
+      minHeight: "64px",
+      maxWidth: "570px",
+      maxHeight: "256px",
+      background: `transparent url("${ASSET_HERO}") center bottom / contain no-repeat`,
+      aspectRatio: "570 / 256",
+      alignSelf: "end",
+      flex: "1 1 50%",
+      transform: `translateY(${((100 * 26) / 256).toFixed(4)}%)`,
+    }}
+  >
+  </div>
+</section>
+<div class={styles.ribbon}>
+  <section class:list={["container", styles.ribbonGrid]}>
+    {
+      NAV_LINKS_FLAT.map((item) => (
+        <a href={item.href} class:list={["hover", styles.card]}>
+          <div class={styles.cardTitle}>
+            <div class={styles.cardTitleIcon}>
+              <Icon
+                icon={item.icon as FeatherIconNames}
+                height={16}
+                width={16}
+                title="icon file"
+                strokeWidth={2}
+              />
+            </div>
+            <span>{item.label}</span>
+          </div>
+          <small class={styles.cardDescription}>{item.description}</small>
+        </a>
+      ))
+    }
+  </section>
+</div>
+<section class="container">
+  <h2 class={styles.sectionHeading}>Why use PDFvise?</h2>
+  <div class={styles.features}>
+    <div class:list={[styles.featureFigure, styles.featureFigureFirst]}>
+      <img
+        loading="lazy"
+        src={ASSET_WAITING}
+        alt="Free"
+        width={380}
+        height={286}
+      />
+    </div>
+    <div>
+      <h3 class={styles.cardTitle}>Free</h3>
+      <p>
+        PDFvise is free for both personal and commercial use. It does require
+        user registration or email verification. All tools are available with no
+        limits: split PDFs, merge multiple PDFs into one, rearrange pages, and
+        more.
+      </p>
+    </div>
+    <div class={styles.featureFigure}>
+      <img
+        loading="lazy"
+        src={ASSET_SECURE}
+        alt="Secure"
+        width={380}
+        height={286}
+      />
+    </div>
+    <div>
+      <h3 class={styles.cardTitle}>Secure</h3>
+      <p>
+        PDFvise is absolutely secure. The entire process happends directly in
+        your browser. Neither your data is uploaded to any secondary location,
+        nor any third parties can access your data.
+      </p>
+    </div>
+    <div class={styles.featureFigure}>
+      <img
+        loading="lazy"
+        src={ASSET_STATS}
+        alt="Fast & Simple"
+        width={380}
+        height={286}
+      />
+    </div>
+    <div>
+      <h3 class={styles.cardTitle}>Fast & Simple</h3>
+      <p>
+        PDFvise is user-friendly and accessible. Without installation of
+        additional software you can perform any action in just 3 simple steps.
+        It only takes the online tool a few seconds to load and save, regardless
+        of file size.
+      </p>
+    </div>
+    <div class:list={[styles.featureFigure, styles.featureFigureLast]}>
+      <img
+        loading="lazy"
+        src={ASSET_DEVICES}
+        alt="Cross-platform"
+        width={380}
+        height={286}
+      />
+    </div>
+    <div>
+      <h3 class={styles.cardTitle}>Cross-platform</h3>
+      <p>
+        PDFvise is completely web-based and can be accessed wherever you are,
+        from any computer. It is compatible with all major browsers and
+        operating systems, including Windows, Mac OS X, and Linux.
+      </p>
+    </div>
+  </div>
+</section>
+<section class="container">
+  <h2 class={styles.sectionHeading}>Frequently Asked Questions</h2>
+  <details open>
+    <summary>
+      <strong>Does PDFvise require any downloads?</strong>
+    </summary>
+    <p>
+      The main goal behind PDFvise is a dependency experience.There is no
+      download or installation required, as everything happens in the browser
+      only.
+    </p>
+  </details>
+  <hr />
+  <details open>
+    <summary>
+      <strong>How safe is PDFvise?</strong>
+    </summary>
+    <p>
+      No data is transferred and no files are uploaded to any secondary
+      location. All the processing happens in the browser using Javascript.
+    </p>
+  </details>
+  <hr />
+  <details open>
+    <summary>
+      <strong>Does PDFvise keep a copy of files?</strong>
+    </summary>
+    <p>
+      Absolutely not. No files are transferred to any secondary location.
+      Everything stays secure at your system and your browser.
+    </p>
+  </details>
+  <hr />
+  <details open>
+    <summary>
+      <strong>Is PDFvise free to use?</strong>
+    </summary>
+    <p>
+      There are no size, time or usage limits. Everything is free to use as long
+      as you have a capable browser.
+    </p>
+  </details>
+  <hr />
+  <details open>
+    <summary>
+      <strong>Is registration necessary on PDFvise?</strong>
+    </summary>
+    <p>
+      No need to subscribe or register. There is nothing to block you from using
+      PDFvise Tools.
+    </p>
+  </details>
+  <hr />
+  <details open>
+    <summary>
+      <strong>How much time is required to PDFvise Tools?</strong>
+    </summary>
+    <p>
+      No files are uploaded to secondary location, and because of that,
+      everything happens under a matter of seconds. Larger files may require
+      more time based on processing power of your browser.
+    </p>
+  </details>
+  <hr />
+  <details open>
+    <summary>
+      <strong>Why is PDFvise taking so long?</strong>
+    </summary>
+    <p>
+      Unfortunately, this is not entirely in our hands. Processing speed depends
+      on many factors, few of which are the size of files and processing power
+      of your system.
+    </p>
+  </details>
+  <hr />
+  <details open>
+    <summary>
+      <strong>What are system requirements for PDFvise?</strong>
+    </summary>
+    <p>
+      To run PDFvise smoothly, following browsers are recommended: Chrome,
+      Firefox, Explorer +10 and Safari.
+    </p>
+  </details>
+  <hr />
+  <details open>
+    <summary>
+      <strong>Is PDFvise supported on Android and iOS?</strong>
+    </summary>
+    <p>
+      PDFvise is a browser-based online tool and supports all the modern
+      browsers in any operating system like iOS (iPhone & iPad), Android,
+      Windows, Linux, etc.
+    </p>
+  </details>
+  <hr />
+  <details open>
+    <summary>
+      <strong>Can I Use PDFvise for My Business?</strong>
+    </summary>
+    <p>
+      PDFvise is a is a free tool, so feel free to use it for all your needs.
+      And if you find using PDFvise an amazing experience, drop us a credit.
+    </p>
+  </details>
+</section>
