@@ -3,9 +3,20 @@
 // https://www.billgenerator.in/
 
 import PageComingSoon from "@/components/PageComingSoon/index.astro";
+import SectionRibbon from "@/components/SectionRibbon/index.astro";
 import BaseLayout from "@/layouts/base.astro";
+
+Astro.response.status = 503;
+Astro.response.statusText = 'Service Unavailable';
 ---
 
-<BaseLayout>
+<BaseLayout
+  title="PDF files online for free. | PDFvise"
+  description="PDF file online without uploading, with no watermarks, & completely free! PDF files easily on your browser only!"
+>
+  <SectionRibbon
+    title="PDF"
+    description="PDF file."
+  />
   <PageComingSoon />
 </BaseLayout>

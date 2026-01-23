@@ -27,6 +27,24 @@
 				"icon": "maximize"
 			},
 			{
+				"href": "/pdf-impose-n-up",
+				"label": "N-Up PDF",
+				"description": "N-Up Multiple PDF files.",
+				"icon": "maximize-2"
+			},
+			{
+				"href": "/pdf-impose-zine",
+				"label": "Zine PDF",
+				"description": "Zine Multiple PDF files.",
+				"icon": "maximize-2"
+			},
+			{
+				"href": "/pdf-resize",
+				"label": "Resize PDF",
+				"description": "Resize PDF to Custom Dimensions",
+				"icon": "maximize-2"
+			},
+			{
 				"href": "/pdf-edit-metadata",
 				"label": "Edit PDF Metadata",
 				"description": "Edit Metadata of PDF file.",
@@ -39,16 +57,22 @@
 				"icon": "edit-3"
 			},
 			{
-				"href": "/pdf-resize",
-				"label": "Resize PDF",
-				"description": "Resize PDF to Custom Dimensions",
-				"icon": "maximize-2"
+				"href": "/pdf-remove-annotation",
+				"label": "Remove PDF Annotation",
+				"description": "Remove Annotation of PDF file.",
+				"icon": "edit-3"
 			},
 			{
 				"href": "/pdf-rotate",
 				"label": "Rotate PDF",
 				"description": "Rotate entire PDF file or multiple PDF files together.",
 				"icon": "refresh-cw"
+			},
+			{
+				"href": "/pdf-reverse",
+				"label": "Reverse PDF",
+				"description": "Reverse entire PDF file or multiple PDF files together.",
+				"icon": "repeat"
 			}
 		]
 	},
