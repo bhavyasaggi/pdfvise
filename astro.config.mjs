@@ -8,6 +8,12 @@ const { PUBLIC_SITE_URL } = loadEnv(process.env.NODE_ENV, process.cwd(), "");
 
 export default defineConfig({
 	site: PUBLIC_SITE_URL,
-	integrations: [preact({ compat: true }), sitemap()],
+	integrations: [
+		preact({
+			compat: true,
+			devtools: process.env.NODE_ENV === "development",
+		}),
+		sitemap(),
+	],
 	trailingSlash: "never",
 });

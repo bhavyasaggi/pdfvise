@@ -19,12 +19,14 @@ const ViewItem = React.forwardRef(function ViewItemRaw(
 
 	const [refIntersectionObserver, isIntersecting] = useIntersectionObserver();
 
-	const { get, getThumbnail, setMeta } = useContext(PDFManagerActionContext);
+	const { get, extractThumbnail, setMeta } = useContext(
+		PDFManagerActionContext,
+	);
 
 	useEffect(() => {
 		let isStale = false;
 		if (isIntersecting) {
-			getThumbnail(props.pdfPage, {
+			extractThumbnail(props.pdfPage, {
 				maxDimension: 128,
 				quality: 0.6,
 			})
@@ -33,21 +35,29 @@ const ViewItem = React.forwardRef(function ViewItemRaw(
 						setThumbnail(
 							thumbnailBlob ? URL.createObjectURL(thumbnailBlob) : undefined,
 						);
+						setLoading(false);
 					}
 				})
-				.finally(() => {
+				.catch((error) => {
+					console.error(error);
 					if (!isStale) {
+						setThumbnail(undefined);
 						setLoading(false);
 					}
 				});
 		}
 		return () => {
 			isStale = true;
+		};
+	}, [extractThumbnail, isIntersecting, props.pdfPage]);
+
+	useEffect(() => {
+		return () => {
 			if (thumbnail) {
 				URL.revokeObjectURL(thumbnail);
 			}
 		};
-	}, [getThumbnail, isIntersecting, props.pdfPage]);
+	}, [thumbnail]);
 
 	const { file, pdfDocumentProxy } = get(props.pdfPage.id) || {};
 

@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.3.5/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
 	"vcs": {
 		"enabled": true,
 		"clientKind": "git",
@@ -15,7 +15,42 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"correctness": {
+				"useExhaustiveDependencies": "error",
+				"useHookAtTopLevel": "error",
+				"noUnusedVariables": "error",
+				"noUnusedImports": "error"
+			},
+			"suspicious": {
+				"noConsole": "warn",
+				"noDebugger": "error",
+				"noDoubleEquals": "error",
+				"noExplicitAny": "error"
+			},
+			"style": {
+				"useConst": "error",
+				"useImportType": "error",
+				"useTemplate": "error"
+			},
+			"security": {
+				"noDangerouslySetInnerHtml": "error"
+			},
+			"complexity": {
+				"noExcessiveCognitiveComplexity": "warn"
+			},
+			"a11y": {
+				"recommended": true,
+				"useAltText": "error",
+				"useButtonType": "error",
+				"useKeyWithClickEvents": "error",
+				"useValidAnchor": "error",
+				"useValidAriaProps": "error",
+				"useValidAriaRole": "error"
+			},
+			"performance": {
+				"recommended": true
+			}
 		}
 	},
 	"javascript": {

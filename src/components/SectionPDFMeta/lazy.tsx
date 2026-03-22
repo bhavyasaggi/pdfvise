@@ -43,7 +43,7 @@ const fallback = (error?: Error) => {
 	);
 };
 
-export default function SectionPDFPagesLazy() {
+export default function SectionPDFMetaLazy() {
 	const [meta, setMeta] = useState<{
 		data: PDFManagerStoreType | undefined;
 		loading: boolean;

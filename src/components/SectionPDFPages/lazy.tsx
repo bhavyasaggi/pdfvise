@@ -43,9 +43,7 @@ const fallback = (error?: Error) => {
 	);
 };
 
-export default function SectionPDFPagesLazy(props: {
-	firstPageOnly?: boolean;
-}) {
+export default function SectionPDFPagesLazy() {
 	const [meta, setMeta] = useState<{
 		data: PDFManagerStoreType | undefined;
 		loading: boolean;
@@ -82,10 +80,7 @@ export default function SectionPDFPagesLazy(props: {
 			{meta.loading ? fallback() : null}
 			{!meta.loading && meta.error ? fallback(meta.error) : null}
 			{!meta.loading && !meta.error && meta.data ? (
-				<SectionPDFPages
-					initStore={meta.data}
-					firstPageOnly={props.firstPageOnly}
-				/>
+				<SectionPDFPages initStore={meta.data} />
 			) : null}
 			{!meta.loading && !meta.error && !meta.data ? (
 				<Dropzone onChange={updateInitStore}>

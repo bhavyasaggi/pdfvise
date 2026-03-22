@@ -11,15 +11,20 @@ export default function ButtonFile(props: {
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	const inputAddListener: React.ChangeEventHandler<HTMLInputElement> =
-		useCallback(async (e) => {
-			const files = e.target.files;
-			await props.onChange?.(
-				Array.from(files || []).map(
-					(file) => new File([file], file.name, { type: file.type }),
-				),
-			);
-			e.target.value = "";
-		}, []);
+		useCallback(
+			async (e) => {
+				// @ts-expect-error e.target is not null
+				const files: FileList | null | undefined = e.target?.files;
+				await props.onChange?.(
+					Array.from(files || []).map(
+						(file) => new File([file], file.name, { type: file.type }),
+					),
+				);
+				// @ts-expect-error e.target is not null
+				e.target.value = "";
+			},
+			[props.onChange],
+		);
 
 	useEffect(() => {
 		// biome-ignore lint/suspicious/noExplicitAny: Transformation Error

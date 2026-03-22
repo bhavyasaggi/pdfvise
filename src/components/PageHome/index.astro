@@ -11,19 +11,19 @@ import Icon from "@/lib/ui/Icon";
 import styles from "./styles.module.scss";
 
 type NavLinkItem = {
-  href: string;
-  icon: string;
-  label: string;
-  description: string;
+	href: string;
+	icon: string;
+	label: string;
+	description: string;
 };
 
 type NavSection = {
-  label: string;
-  links: NavLinkItem[];
+	label: string;
+	links: NavLinkItem[];
 };
 
 const NAV_LINKS_FLAT = (NAV_LINKS as NavSection[]).flatMap(
-  (item) => item.links
+	(item) => item.links,
 );
 ---
 

@@ -2,15 +2,18 @@ import type React from "react";
 import { useContext } from "react";
 import ButtonFile from "@/lib/ui/ButtonFile";
 import Icon from "@/lib/ui/Icon";
-import type { pdflib } from "@/lib/utils/pdf";
 
 import { PDFManagerActionContext, PDFManagerValueContext } from "../context";
 import styles from "../styles.module.scss";
+import type { PDFPageDataType } from "../types";
 
 export interface PDFMangerFormProps {
 	onSubmit?: (
-		data: Array<pdflib.PDFPage>,
+		data?: PDFPageDataType[],
 		formData?: FormData,
+		utils?: Partial<
+			React.ComponentProps<typeof PDFManagerActionContext.Provider>["value"]
+		>,
 	) => Promise<void>;
 	onReset?: () => void;
 	children?: React.ReactNode;
@@ -19,55 +22,58 @@ export interface PDFMangerFormProps {
 }
 
 export default function PDFManagerForm(props: PDFMangerFormProps) {
-	const { data, isLoading } = useContext(PDFManagerValueContext);
-	const { get, add, setMeta } = useContext(PDFManagerActionContext);
+	const { data, isUninitialized, isLoading } = useContext(
+		PDFManagerValueContext,
+	);
+	const { get, add, setMeta, extractImage, extractThumbnail } = useContext(
+		PDFManagerActionContext,
+	);
 
 	return (
 		<form
 			onSubmit={async (e) => {
-				e.preventDefault();
-				setMeta((prev) => ({ ...prev, isLoading: true }));
+				try {
+					e.preventDefault();
+					setMeta((prev) => ({ ...prev, isLoading: true }));
 
-				const pages = (data || [])
-					.map((item) => {
-						const page = get(item.id)?.pdfDocument.getPage(item.index);
-						if (!page) {
-							return undefined;
-						}
-						// TODO:
-						page.setSize(item.width, item.height);
-						page.setCropBox(
-							item.cropLeft,
-							item.cropTop,
-							item.width - item.cropLeft - item.cropRight,
-							item.height - item.cropTop - item.cropBottom,
-						);
-						page.setRotation({
-							type: "degrees" as pdflib.RotationTypes.Degrees,
-							angle: item.rotation,
-						});
-						return page;
-					})
-					.filter(Boolean) as pdflib.PDFPage[];
-				const formData = new FormData(e.currentTarget);
-				e.currentTarget.reset();
+					const formData = new FormData(e.currentTarget);
+					await props.onSubmit?.(data, formData, {
+						get,
+						extractImage,
+						extractThumbnail,
+					});
 
-				await props.onSubmit?.(pages, formData);
-
-				setMeta((prev) => ({ ...prev, isLoading: false, data: [] }));
+					setMeta((prev) => ({ ...prev, isLoading: false, data: [] }));
+				} catch (error) {
+					console.error(error);
+					globalThis.alert(
+						`Error: ${(error as Error)?.message || "Unknown error"}`,
+					);
+				}
 			}}
 			onReset={(e) => {
-				e.preventDefault();
-				e.currentTarget.reset();
-				props.onReset?.();
-				setMeta((prev) => ({ ...prev, isLoading: false, data: [] }));
+				try {
+					e.preventDefault();
+					e.currentTarget.reset();
+					props.onReset?.();
+					setMeta((prev) => ({ ...prev, isLoading: false, data: [] }));
+				} catch (error) {
+					console.error(error);
+					globalThis.alert(
+						`Error: ${(error as Error)?.message || "Unknown error"}`,
+					);
+				}
 			}}
 			className={[styles.formContainer, props.className]
 				.filter(Boolean)
 				.join(" ")}
 			style={props.style}
 		>
-			<button type="submit" disabled={isLoading} className={styles.formButton}>
+			<button
+				type="submit"
+				disabled={isUninitialized || isLoading}
+				className={styles.formButton}
+			>
 				<Icon
 					icon="download-cloud"
 					height={16}
@@ -77,7 +83,7 @@ export default function PDFManagerForm(props: PDFMangerFormProps) {
 				<span>Save & Download</span>
 			</button>
 			<ButtonFile
-				disabled={isLoading}
+				disabled={isUninitialized || isLoading}
 				className={["outline", styles.formButton].join(" ")}
 				onChange={async (files) => {
 					const file = files?.[0];
@@ -92,7 +98,7 @@ export default function PDFManagerForm(props: PDFMangerFormProps) {
 			{props.children}
 			<button
 				type="reset"
-				disabled={isLoading}
+				disabled={isUninitialized || isLoading}
 				className={["outline", "secondary", styles.formButton].join(" ")}
 			>
 				Reset

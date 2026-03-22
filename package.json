@@ -8,6 +8,9 @@
 	"scripts": {
 		"prepare": "husky",
 		"lint-staged": "lint-staged",
+		"lint": "biome check",
+		"lint:fix": "biome check --fix",
+		"format": "biome format --write",
 		"dev": "astro dev",
 		"build": "astro build",
 		"preview": "astro preview",

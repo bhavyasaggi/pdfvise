@@ -6,20 +6,21 @@ import SuspenseErrorBoundary from "@/lib/ui/SuspenseErrorBoundary";
 
 import { PDFManagerActionContext, PDFManagerValueContext } from "../context";
 import styles from "../styles.module.scss";
+
+import ViewImage from "../ViewImage";
 import ViewItem from "../ViewItem";
 
 // TODO: Replace with proper fallback
 const fallback = (error?: Error) => {
-	return error ? <div>Error</div> : <div>Loading...</div>;
+	return error ? <div>Error: {error.message}</div> : <div>Loading...</div>;
 };
 
 export default function PDFManagerView(props: {
-	value?: number;
 	onChange?: (index: number) => void;
 	className?: string;
 	style?: React.CSSProperties;
 }) {
-	const { data, isLoading, error } = useContext(PDFManagerValueContext);
+	const { mode, data, isLoading, error } = useContext(PDFManagerValueContext);
 	const { setMeta } = useContext(PDFManagerActionContext);
 
 	return (
@@ -61,15 +62,32 @@ export default function PDFManagerView(props: {
 				{(data || []).map((item, itemIndex) => (
 					<SuspenseErrorBoundary
 						fallback={fallback}
-						key={`__${item.id}-${item.index}-${itemIndex}`}
+						key={`__${item.id}-${item.index}-${item.opIndex || 0}_${itemIndex}`}
 					>
-						<SortableItem key={`__${item.id}-${item.index}-${itemIndex}`}>
-							<ViewItem index={itemIndex} pdfPage={item} disabled={isLoading} />
+						<SortableItem
+							key={`__${item.id}-${item.index}-${item.opIndex || 0}_${itemIndex}`}
+						>
+							{mode === "imagesOnly" &&
+							item.opIndex != null &&
+							item.opIndex !== undefined ? (
+								<ViewImage
+									index={itemIndex}
+									imageIndex={item.opIndex}
+									pdfPage={item}
+									disabled={isLoading}
+								/>
+							) : (
+								<ViewItem
+									index={itemIndex}
+									pdfPage={item}
+									disabled={isLoading}
+								/>
+							)}
 						</SortableItem>
 					</SuspenseErrorBoundary>
 				))}
 			</SortableList>
-			{!data || !data.length ? (
+			{!isLoading && !error && (!data || !data.length) ? (
 				<p style={{ textAlign: "center" }}>Add a File to continue.</p>
 			) : null}
 		</div>

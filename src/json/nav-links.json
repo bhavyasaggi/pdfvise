@@ -115,7 +115,7 @@
 		"label": "Misc.",
 		"links": [
 			{
-				"href": "/extract-images-from-pdf",
+				"href": "/extract-text-ocr-from-pdf",
 				"label": "Extract PDF Text",
 				"description": "Extract all Text from a PDF file.",
 				"icon": "align-left"

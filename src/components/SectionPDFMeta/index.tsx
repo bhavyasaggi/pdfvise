@@ -1,16 +1,42 @@
 import type React from "react";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import Icon from "@/lib/ui/Icon";
 import Input from "@/lib/ui/Input";
 import PDFManager from "@/lib/ui/PDFManager";
-import { imposePDFPages, type pdflib } from "@/lib/utils/pdf";
+import type { pdflib } from "@/lib/utils/pdf";
+
 import styles from "./styles.module.scss";
 
 export default function SectionPDFMeta(
 	props: React.ComponentProps<typeof PDFManager>,
 ) {
+	const downloadLinkRef = useRef<string>("");
 	const handleSave = useCallback(
-		async (data: pdflib.PDFPage[], formData?: FormData) => {
+		(async (pages, formData, utils) => {
+			if (downloadLinkRef.current) {
+				URL.revokeObjectURL(downloadLinkRef.current);
+			}
+			const data = (pages || [])
+				.map((item) => {
+					const page = utils?.get?.(item.id)?.pdfDocument?.getPage(item.index);
+					if (!page) {
+						return undefined;
+					}
+					page.setSize(item.width, item.height);
+					page.setCropBox(
+						item.cropLeft,
+						item.cropTop,
+						item.width - item.cropLeft - item.cropRight,
+						item.height - item.cropTop - item.cropBottom,
+					);
+					page.setRotation({
+						type: "degrees" as pdflib.RotationTypes.Degrees,
+						angle: item.rotation,
+					});
+					return page;
+				})
+				.filter((page): page is pdflib.PDFPage => Boolean(page));
+
 			const metaTitle = String(formData?.get("metaTitle") || "") || undefined;
 			const metaSubject =
 				String(formData?.get("metaSubject") || "") || undefined;
@@ -24,6 +50,7 @@ export default function SectionPDFMeta(
 			const metaModificationDate =
 				String(formData?.get("metaModificationDate") || "") || undefined;
 
+			const { imposePDFPages } = await import("@/lib/utils/pdf");
 			const doc = await imposePDFPages(data, {
 				metaTitle,
 				metaSubject,
@@ -47,13 +74,10 @@ export default function SectionPDFMeta(
 			a.download = `merged-${Date.now().toString(36)}.pdf`;
 
 			a.click();
-			setTimeout(
-				() => {
-					URL.revokeObjectURL(a.href);
-				},
-				2 * 60 * 1000,
-			);
-		},
+			downloadLinkRef.current = a.href;
+		}) satisfies NonNullable<
+			React.ComponentProps<typeof PDFManager.Form>["onSubmit"]
+		>,
 		[],
 	);
 

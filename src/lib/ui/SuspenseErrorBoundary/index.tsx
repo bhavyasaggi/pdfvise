@@ -14,11 +14,11 @@ export default class SuspenseErrorBoundary extends React.Component<
 		this.state = { error: null };
 	}
 
-	static getDerivedStateFromError(error: Error) {
+	static override getDerivedStateFromError(error: Error) {
 		return { error };
 	}
 
-	componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+	override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
 		// You can also log the error to an error reporting service
 		console.error(error);
 		console.info(errorInfo);

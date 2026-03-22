@@ -1,10 +1,9 @@
-import JSZip from "jszip";
 import type React from "react";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import Input from "@/lib/ui/Input";
 import InputSelect from "@/lib/ui/InputSelect";
 import PDFManager from "@/lib/ui/PDFManager";
-import { imposePDFPages, pdflib } from "@/lib/utils/pdf";
+import type { pdflib } from "@/lib/utils/pdf";
 
 import styles from "./styles.module.scss";
 
@@ -15,7 +14,16 @@ const DATA_PAGE_LAYOUT_OPTIONS = [
 ];
 const DATA_PAGE_SIZE_OPTIONS = [
 	{ value: "", label: "Original" },
-	...Object.keys(pdflib.PageSizes),
+	{ value: "A3", label: "A3" },
+	{ value: "A4", label: "A4" },
+	{ value: "A5", label: "A5" },
+	{ value: "A6", label: "A6" },
+	{ value: "B5", label: "B5" },
+	{ value: "Executive", label: "Executive" },
+	{ value: "Folio", label: "Folio" },
+	{ value: "Legal", label: "Legal" },
+	{ value: "Letter", label: "Letter" },
+	{ value: "Tabloid", label: "Tabloid" },
 ];
 const DATA_PAGE_ORIENTATION_OPTIONS = [
 	{ value: "", label: "Original" },
@@ -39,8 +47,35 @@ const DATA_PAGE_FLATTEN_OPTIONS = [
 export default function SectionPDFPages(
 	props: React.ComponentProps<typeof PDFManager>,
 ) {
+	const downloadLinkRef = useRef<string>("");
 	const handleSave = useCallback(
-		async (data: pdflib.PDFPage[], formData?: FormData) => {
+		(async (pages, formData, utils) => {
+			if (downloadLinkRef.current) {
+				URL.revokeObjectURL(downloadLinkRef.current);
+			}
+			const data = (pages || [])
+				.map((item) => {
+					const page = utils?.get?.(item.id)?.pdfDocument?.getPage(item.index);
+					if (!page) {
+						return undefined;
+					}
+					page.setSize(item.width, item.height);
+					page.setCropBox(
+						item.cropLeft,
+						item.cropTop,
+						item.width - item.cropLeft - item.cropRight,
+						item.height - item.cropTop - item.cropBottom,
+					);
+					page.setRotation({
+						type: "degrees" as pdflib.RotationTypes.Degrees,
+						angle: item.rotation,
+					});
+					return page;
+				})
+				.filter((page): page is pdflib.PDFPage => Boolean(page));
+
+			const { pdflib, imposePDFPages } = await import("@/lib/utils/pdf");
+
 			const pageLayout = String(formData?.get("pageLayout") || "");
 			const pageSize = String(formData?.get("pageSize") || "");
 			let [pageWidth, pageHeight] = pageSize
@@ -122,9 +157,12 @@ export default function SectionPDFPages(
 
 			const a = document.createElement("a");
 			if (batchBlob.length === 1) {
-				a.href = URL.createObjectURL(batchBlob[0]);
-				a.download = `merged-${Date.now().toString(36)}.pdf`;
+				if (batchBlob[0]) {
+					a.href = URL.createObjectURL(batchBlob[0]);
+					a.download = `merged-${Date.now().toString(36)}.pdf`;
+				}
 			} else if (batchBlob.length > 1) {
+				const { default: JSZip } = await import("jszip");
 				const zip = new JSZip();
 				batchBlob.forEach((blob, index) => {
 					zip.file(
@@ -142,14 +180,11 @@ export default function SectionPDFPages(
 
 			if (a.href) {
 				a.click();
-				setTimeout(
-					() => {
-						URL.revokeObjectURL(a.href);
-					},
-					2 * 60 * 1000,
-				);
+				downloadLinkRef.current = a.href;
 			}
-		},
+		}) satisfies NonNullable<
+			React.ComponentProps<typeof PDFManager.Form>["onSubmit"]
+		>,
 		[],
 	);
 

@@ -1,10 +1,8 @@
 ---
-import PageComingSoon from "@/components/PageComingSoon/index.astro";
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
+import SectionPDFExtractImagesLazy from "@/components/SectionPDFExtractImages/lazy";
 import SectionRibbon from "@/components/SectionRibbon/index.astro";
 import BaseLayout from "@/layouts/base.astro";
-
-Astro.response.status = 503;
-Astro.response.statusText = 'Service Unavailable';
 ---
 
 <BaseLayout
@@ -15,5 +13,36 @@ Astro.response.statusText = 'Service Unavailable';
     title="Extract PDF Images"
     description="Extract all Images from a PDF file."
   />
-  <PageComingSoon />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionPDFExtractImagesLazy client:load />
+    </div>
+    <SectionHowTo
+      title="How to Extract all Images from a PDF file?"
+      description="Extract all Images from a PDF file online without uploading, with no watermarks, & completely free! Extract Images from PDF files easily on your browser only!."
+    >
+      <ol>
+        <li>Select all PDF files</li>
+        <li>Re-order, or Remove your images</li>
+        <li>Save & Download ZIP</li>
+      </ol>
+    </SectionHowTo>
+    <section class="container">
+      <h2 style="text-align: center; color: var(--pico-primary);">
+        Frequently Asked Questions
+      </h2>
+      <details open>
+        <summary>
+          <strong>Can I extract images from multiple PDF files at once?</strong>
+        </summary>
+        <p>
+          Yes, you can upload multiple PDF files, and PDFvise will extract images
+          from all of them and bundle them into a single ZIP file.
+        </p>
+      </details>
+    </section>
+  </div>
 </BaseLayout>

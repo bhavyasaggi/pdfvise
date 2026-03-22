@@ -120,11 +120,12 @@ async function imposePDFPages(
 	});
 	for (let pageIndex = 0; pageIndex < pages.length; pageIndex += 1) {
 		const { value: layoutOptions, done: layoutDone } = layoutGenerator.next();
-		if (layoutDone || !layoutOptions) {
-			break;
-		}
 		const docPageCount = doc.getPageCount();
 		const pageToDraw = pages[pageIndex];
+
+		if (layoutDone || !layoutOptions || !pageToDraw) {
+			break;
+		}
 
 		const pageToDrawOnWidth = pageWidth || pageToDraw.getWidth();
 		const pageToDrawOnHeight = pageHeight || pageToDraw.getHeight();
@@ -211,4 +212,96 @@ async function imposePDFPages(
 	return doc;
 }
 
-export { pdflib, pdfjs, parsePDFDocument, imposePDFPages };
+async function parsePDFEmbedImage<
+	R extends {
+		width: number;
+		height: number;
+		data: Uint8ClampedArray | null;
+		bitmap?: ImageBitmap;
+	},
+>(pdfPageProxy: pdfjs.PDFPageProxy, imgFn: string): Promise<R | undefined> {
+	const img: R | undefined = await new Promise((resolve) => {
+		try {
+			if (pdfPageProxy.objs.has(imgFn)) {
+				pdfPageProxy.objs.get(imgFn, resolve);
+			} else {
+				resolve(undefined);
+			}
+		} catch (error) {
+			console.error(error);
+			resolve(undefined);
+		}
+	});
+	if (img) {
+		return img;
+	}
+
+	const commonImg: R | undefined = await new Promise((resolve) => {
+		try {
+			if (pdfPageProxy.commonObjs.has(imgFn)) {
+				pdfPageProxy.commonObjs.get(imgFn, resolve);
+			} else {
+				resolve(undefined);
+			}
+		} catch (error) {
+			console.error(error);
+			resolve(undefined);
+		}
+	});
+	if (commonImg) {
+		return commonImg;
+	}
+
+	return undefined;
+}
+
+async function* extractPDFEmbedImages(
+	pdfDocumentProxy: pdfjs.PDFDocumentProxy,
+) {
+	let currentPage = 0;
+
+	while (currentPage < pdfDocumentProxy.numPages) {
+		const pdfPageProxy = await pdfDocumentProxy.getPage(currentPage + 1);
+		const { fnArray, argsArray } = await pdfPageProxy.getOperatorList();
+		let currentPageImage = 0;
+		while (currentPageImage < fnArray.length) {
+			const fn = fnArray[currentPageImage];
+			const args = argsArray[currentPageImage];
+			let img:
+				| {
+						width: number;
+						height: number;
+						data: Uint8ClampedArray | null;
+						bitmap?: ImageBitmap;
+				  }
+				| undefined;
+			if (fn === pdfjs.OPS.paintInlineImageXObject) {
+				img = args[0];
+			} else if (fn === pdfjs.OPS.paintImageXObject) {
+				const objId: string = args[0];
+				img = await parsePDFEmbedImage(pdfPageProxy, objId);
+			}
+			if (img) {
+				yield {
+					pageIndex: currentPage,
+					imageIndex: currentPageImage,
+					width: img.width,
+					height: img.height,
+					data: img.data,
+					bitmap: img.bitmap,
+				};
+			}
+			currentPageImage += 1;
+		}
+		currentPage += 1;
+	}
+}
+
+export {
+	pdflib,
+	pdfjs,
+	parsePDFDocument,
+	imposePDFPages,
+	parsePDFEmbedImage,
+	extractPDFEmbedImages,
+};
