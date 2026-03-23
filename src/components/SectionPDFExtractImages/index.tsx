@@ -1,56 +1,48 @@
-import type React from "react";
-import { useCallback, useRef } from "react";
+import type { ComponentProps } from "react";
+import { useCallback } from "react";
+
 import PDFManager from "@/lib/ui/PDFManager";
+import { padIndex } from "@/lib/utils/pdf-geometry";
 
 import styles from "./styles.module.scss";
 
 export default function SectionPDFExtractImages(
-	props: React.ComponentProps<typeof PDFManager>,
+	props: ComponentProps<typeof PDFManager>,
 ) {
-	const downloadLinkRef = useRef<string>("");
-	const handleSave = useCallback(
-		(async (pages, _formData, utils) => {
-			if (downloadLinkRef.current) {
-				URL.revokeObjectURL(downloadLinkRef.current);
+	const handleSave = useCallback<
+		NonNullable<ComponentProps<typeof PDFManager.Form>["onSubmit"]>
+	>(async (pages, _formData, utils) => {
+		const images = pages ?? [];
+		const { default: JSZip } = await import("jszip");
+		const { downloadBlob } = await import("@/lib/utils/download");
+		const zip = new JSZip();
+		const fileOrder = new Map<string, number>();
+		let count = 0;
+		for (const page of images) {
+			if (page.opIndex === undefined) {
+				continue;
 			}
-
-			const { default: JSZip } = await import("jszip");
-			const zip = new JSZip();
-
-			for (const page of pages || []) {
-				if (!page?.opIndex) {
-					continue;
-				}
-
-				const image = await utils?.extractImage?.(
-					{ id: page.id, index: page.index },
-					{
-						imageIndex: page.opIndex,
-					},
-				);
-				if (image) {
-					zip.file(
-						`page-${`${page.opIndex + 1}`.padStart(
-							Math.max(0, 9 - String(page.opIndex + 1).length),
-							"0",
-						)}.png`,
-						image,
-					);
-				}
+			const image = await utils?.extractImage?.(
+				{ id: page.id, index: page.index },
+				{ imageIndex: page.opIndex },
+			);
+			if (!image) {
+				continue;
 			}
-
-			const bytes = await zip.generateAsync({ type: "blob" });
-			const a = document.createElement("a");
-			a.href = URL.createObjectURL(bytes);
-			a.download = `images-${Date.now().toString(36)}.zip`;
-
-			a.click();
-			downloadLinkRef.current = a.href;
-		}) satisfies NonNullable<
-			React.ComponentProps<typeof PDFManager.Form>["onSubmit"]
-		>,
-		[],
-	);
+			count += 1;
+			const fileNumber = fileOrder.get(page.id) ?? fileOrder.size + 1;
+			fileOrder.set(page.id, fileNumber);
+			zip.file(
+				`file-${padIndex(fileNumber, images.length)}-page-${padIndex(page.index + 1, images.length)}-image-${padIndex(count, images.length)}.png`,
+				image,
+			);
+		}
+		if (count === 0) {
+			throw new Error("No images were found in this PDF.");
+		}
+		const bytes = await zip.generateAsync({ type: "blob" });
+		downloadBlob(bytes, `images-${Date.now().toString(36)}.zip`);
+	}, []);
 
 	return (
 		<PDFManager {...props} mode="imagesOnly">
@@ -61,7 +53,7 @@ export default function SectionPDFExtractImages(
 				>
 					<hr />
 				</PDFManager.Form>
-				<PDFManager.View className={styles.viewContainer as string} />
+				<PDFManager.View className={styles.viewContainer} />
 			</div>
 		</PDFManager>
 	);

@@ -5,6 +5,7 @@ import ASSET_HERO from "@/assets/hero.svg?url";
 import ASSET_SECURE from "@/assets/secure.svg?url";
 import ASSET_STATS from "@/assets/stats.svg?url";
 import ASSET_WAITING from "@/assets/waiting.svg?url";
+import SectionFaq from "@/components/SectionFaq/index.astro";
 import NAV_LINKS from "@/json/nav-links.json";
 import Icon from "@/lib/ui/Icon";
 
@@ -72,7 +73,8 @@ const NAV_LINKS_FLAT = (NAV_LINKS as NavSection[]).flatMap(
                 icon={item.icon as FeatherIconNames}
                 height={16}
                 width={16}
-                title="icon file"
+                title={item.label}
+                decorative
                 strokeWidth={2}
               />
             </div>
@@ -99,7 +101,7 @@ const NAV_LINKS_FLAT = (NAV_LINKS as NavSection[]).flatMap(
     <div>
       <h3 class={styles.cardTitle}>Free</h3>
       <p>
-        PDFvise is free for both personal and commercial use. It does require
+        PDFvise is free for both personal and commercial use. It does not require
         user registration or email verification. All tools are available with no
         limits: split PDFs, merge multiple PDFs into one, rearrange pages, and
         more.
@@ -117,9 +119,8 @@ const NAV_LINKS_FLAT = (NAV_LINKS as NavSection[]).flatMap(
     <div>
       <h3 class={styles.cardTitle}>Secure</h3>
       <p>
-        PDFvise is absolutely secure. The entire process happends directly in
-        your browser. Neither your data is uploaded to any secondary location,
-        nor any third parties can access your data.
+        PDFvise is absolutely secure. The entire process happens directly in
+        your browser. Your files stay on your system. Nothing is uploaded.
       </p>
     </div>
     <div class={styles.featureFigure}>
@@ -136,8 +137,7 @@ const NAV_LINKS_FLAT = (NAV_LINKS as NavSection[]).flatMap(
       <p>
         PDFvise is user-friendly and accessible. Without installation of
         additional software you can perform any action in just 3 simple steps.
-        It only takes the online tool a few seconds to load and save, regardless
-        of file size.
+        Most files finish in a few seconds. A single PDF can be up to 100 MB.
       </p>
     </div>
     <div class:list={[styles.featureFigure, styles.featureFigureLast]}>
@@ -159,109 +159,17 @@ const NAV_LINKS_FLAT = (NAV_LINKS as NavSection[]).flatMap(
     </div>
   </div>
 </section>
-<section class="container">
-  <h2 class={styles.sectionHeading}>Frequently Asked Questions</h2>
-  <details open>
-    <summary>
-      <strong>Does PDFvise require any downloads?</strong>
-    </summary>
-    <p>
-      The main goal behind PDFvise is a dependency experience.There is no
-      download or installation required, as everything happens in the browser
-      only.
-    </p>
-  </details>
-  <hr />
-  <details open>
-    <summary>
-      <strong>How safe is PDFvise?</strong>
-    </summary>
-    <p>
-      No data is transferred and no files are uploaded to any secondary
-      location. All the processing happens in the browser using Javascript.
-    </p>
-  </details>
-  <hr />
-  <details open>
-    <summary>
-      <strong>Does PDFvise keep a copy of files?</strong>
-    </summary>
-    <p>
-      Absolutely not. No files are transferred to any secondary location.
-      Everything stays secure at your system and your browser.
-    </p>
-  </details>
-  <hr />
-  <details open>
-    <summary>
-      <strong>Is PDFvise free to use?</strong>
-    </summary>
-    <p>
-      There are no size, time or usage limits. Everything is free to use as long
-      as you have a capable browser.
-    </p>
-  </details>
-  <hr />
-  <details open>
-    <summary>
-      <strong>Is registration necessary on PDFvise?</strong>
-    </summary>
-    <p>
-      No need to subscribe or register. There is nothing to block you from using
-      PDFvise Tools.
-    </p>
-  </details>
-  <hr />
-  <details open>
-    <summary>
-      <strong>How much time is required to PDFvise Tools?</strong>
-    </summary>
-    <p>
-      No files are uploaded to secondary location, and because of that,
-      everything happens under a matter of seconds. Larger files may require
-      more time based on processing power of your browser.
-    </p>
-  </details>
-  <hr />
-  <details open>
-    <summary>
-      <strong>Why is PDFvise taking so long?</strong>
-    </summary>
-    <p>
-      Unfortunately, this is not entirely in our hands. Processing speed depends
-      on many factors, few of which are the size of files and processing power
-      of your system.
-    </p>
-  </details>
-  <hr />
-  <details open>
-    <summary>
-      <strong>What are system requirements for PDFvise?</strong>
-    </summary>
-    <p>
-      To run PDFvise smoothly, following browsers are recommended: Chrome,
-      Firefox, Explorer +10 and Safari.
-    </p>
-  </details>
-  <hr />
-  <details open>
-    <summary>
-      <strong>Is PDFvise supported on Android and iOS?</strong>
-    </summary>
-    <p>
-      PDFvise is a browser-based online tool and supports all the modern
-      browsers in any operating system like iOS (iPhone & iPad), Android,
-      Windows, Linux, etc.
-    </p>
-  </details>
-  <hr />
-  <details open>
-    <summary>
-      <strong>Can I Use PDFvise for My Business?</strong>
-    </summary>
-    <p>
-      PDFvise is a is a free tool, so feel free to use it for all your needs.
-      And if you find using PDFvise an amazing experience, drop us a credit.
-    </p>
-  </details>
-</section>
+<SectionFaq
+  items={[
+    { question: "Does PDFvise require any downloads?", answer: "PDFvise runs in the browser. There is no download or installation required." },
+    { question: "How safe is PDFvise?", answer: "No data is transferred and no files are uploaded to any secondary location. All the processing happens in the browser using Javascript." },
+    { question: "Does PDFvise keep a copy of files?", answer: "Absolutely not. No files are transferred to any secondary location. Everything stays secure at your system and your browser." },
+    { question: "Is PDFvise free to use?", answer: "There is no account and no daily cap. A single PDF can be up to 100 MB." },
+    { question: "Is registration necessary on PDFvise?", answer: "No need to subscribe or register. There is nothing to block you from using PDFvise Tools." },
+    { question: "How long do PDFvise tools take?", answer: "Files stay in the browser, so most tools finish in a few seconds. Larger files take longer on a slower computer." },
+    { question: "Why is PDFvise taking so long?", answer: "Processing speed depends on the size of the file and the processing power of your system." },
+    { question: "What are system requirements for PDFvise?", answer: "PDFvise runs in current versions of Chrome, Firefox, Safari, and Edge." },
+    { question: "Is PDFvise supported on Android and iOS?", answer: "PDFvise is a browser-based online tool and supports all the modern browsers in any operating system like iOS (iPhone & iPad), Android, Windows, Linux, etc." },
+    { question: "Can I Use PDFvise for My Business?", answer: "PDFvise is a free tool, so feel free to use it for all your needs. If it is useful, a credit is appreciated." },
+  ]}
+/>

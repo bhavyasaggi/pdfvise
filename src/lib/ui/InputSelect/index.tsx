@@ -1,4 +1,4 @@
-import type React from "react";
+import type { CSSProperties } from "preact";
 
 function InputSelectOptions(props: {
 	data?: Array<string | { value: string; label: string }>;
@@ -20,19 +20,25 @@ export default function InputSelect(props: {
 	id?: string;
 	name?: string;
 	label?: string;
+	ariaLabel?: string;
 	defaultValue?: string;
 	onChange?: (value: string) => void;
 	data?: Array<string | { value: string; label: string }>;
 	className?: string;
-	style?: React.CSSProperties;
+	style?: CSSProperties;
 }) {
 	if (!props.label) {
 		return (
 			<select
 				id={props.id}
 				name={props.name}
+				aria-label={props.ariaLabel}
 				defaultValue={props.defaultValue}
-				onChange={(e) => props.onChange?.(e.target.value)}
+				onChange={(event) => {
+					if (event.currentTarget instanceof HTMLSelectElement) {
+						props.onChange?.(event.currentTarget.value);
+					}
+				}}
 				className={props.className}
 				style={props.style}
 			>
@@ -48,7 +54,11 @@ export default function InputSelect(props: {
 				id={props.id}
 				name={props.name}
 				defaultValue={props.defaultValue}
-				onChange={(e) => props.onChange?.(e.target.value)}
+				onChange={(event) => {
+					if (event.currentTarget instanceof HTMLSelectElement) {
+						props.onChange?.(event.currentTarget.value);
+					}
+				}}
 			>
 				<InputSelectOptions data={props.data} />
 			</select>

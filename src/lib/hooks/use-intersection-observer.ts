@@ -23,15 +23,16 @@ export function useIntersectionObserver(): IntersectionReturn {
 
 	useEffect(() => {
 		// Ensure we have a ref to observe
-		if (!ref) return;
-
-		// Ensure the browser supports the Intersection Observer API
-		if (!("IntersectionObserver" in window)) return;
-
-		// Skip if frozen
-		if (frozen) return;
-
-		let unobserve: (() => void) | undefined;
+		if (!ref) {
+			return;
+		}
+		if (!("IntersectionObserver" in window)) {
+			setState({ isIntersecting: true });
+			return;
+		}
+		if (frozen) {
+			return;
+		}
 
 		const observer = new IntersectionObserver(
 			(entries: IntersectionObserverEntry[]): void => {
@@ -47,11 +48,6 @@ export function useIntersectionObserver(): IntersectionReturn {
 						);
 
 					setState({ isIntersecting, entry });
-
-					if (isIntersecting && unobserve) {
-						unobserve();
-						unobserve = undefined;
-					}
 				});
 			},
 		);

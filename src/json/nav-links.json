@@ -27,6 +27,12 @@
 				"icon": "maximize"
 			},
 			{
+				"href": "/pdf-crop",
+				"label": "Crop PDF",
+				"description": "Trim the same amount from every page.",
+				"icon": "crop"
+			},
+			{
 				"href": "/pdf-impose-n-up",
 				"label": "N-Up PDF",
 				"description": "N-Up Multiple PDF files.",
@@ -43,6 +49,30 @@
 				"label": "Resize PDF",
 				"description": "Resize PDF to Custom Dimensions",
 				"icon": "maximize-2"
+			},
+			{
+				"href": "/pdf-add-page-numbering",
+				"label": "Add Page Numbers",
+				"description": "Stamp a footer on every page.",
+				"icon": "hash"
+			},
+			{
+				"href": "/pdf-add-bates-numbering",
+				"label": "Add Bates Numbers",
+				"description": "Stamp an incrementing number on every page.",
+				"icon": "hash"
+			},
+			{
+				"href": "/pdf-add-letterhead",
+				"label": "Add Letterhead",
+				"description": "Center a line of text at the top of every page.",
+				"icon": "type"
+			},
+			{
+				"href": "/pdf-overlay",
+				"label": "Add Watermark",
+				"description": "Draw diagonal text across every page.",
+				"icon": "droplet"
 			},
 			{
 				"href": "/pdf-edit-metadata",
@@ -112,12 +142,53 @@
 		]
 	},
 	{
+		"label": "Create PDF",
+		"links": [
+			{
+				"href": "/pdf-generate-invoice-bill",
+				"label": "Invoice",
+				"description": "Create an invoice PDF in your browser.",
+				"icon": "file-text"
+			},
+			{
+				"href": "/pdf-generate-rent-receipt",
+				"label": "Rent Receipt",
+				"description": "Create a rent receipt PDF in your browser.",
+				"icon": "clipboard"
+			},
+			{
+				"href": "/pdf-generate-salary-slip",
+				"label": "Salary Slip",
+				"description": "Create a salary slip PDF in your browser.",
+				"icon": "briefcase"
+			},
+			{
+				"href": "/pdf-generate-expense-report",
+				"label": "Expense Report",
+				"description": "Create an expense report PDF in your browser.",
+				"icon": "file"
+			},
+			{
+				"href": "/pdf-generate-resume",
+				"label": "Resume",
+				"description": "Create a resume PDF in your browser.",
+				"icon": "user"
+			},
+			{
+				"href": "/pdf-scan",
+				"label": "Scan PDF",
+				"description": "Turn photos of pages into a PDF.",
+				"icon": "camera"
+			}
+		]
+	},
+	{
 		"label": "Misc.",
 		"links": [
 			{
 				"href": "/extract-text-ocr-from-pdf",
 				"label": "Extract PDF Text",
-				"description": "Extract all Text from a PDF file.",
+				"description": "Extract the text layer from a PDF file.",
 				"icon": "align-left"
 			},
 			{

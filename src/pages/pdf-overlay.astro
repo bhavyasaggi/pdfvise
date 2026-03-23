@@ -1,0 +1,40 @@
+---
+import SectionFaq from "@/components/SectionFaq/index.astro";
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
+import SectionPDFPagesLazy from "@/components/SectionPDFPages/lazy";
+import SectionRibbon from "@/components/SectionRibbon/index.astro";
+import BaseLayout from "@/layouts/base.astro";
+---
+
+<BaseLayout
+  title="Add a text watermark to a PDF online for free. | PDFvise"
+  description="Add a text watermark to a PDF online without uploading, with no extra watermarks, and completely free. Stamp text in your browser."
+>
+  <SectionRibbon
+    title="Add Watermark"
+    description="Draw a diagonal line of text across every page."
+  />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionPDFPagesLazy tool="watermark" client:load />
+    </div>
+    <SectionHowTo
+      title="How to watermark a PDF?"
+      description="Add a text watermark online without uploading. The stamp is drawn in your browser."
+    >
+      <ol>
+        <li>Select PDF files</li>
+        <li>Type the watermark</li>
+        <li>Save & Download</li>
+      </ol>
+    </SectionHowTo>
+    <SectionFaq
+  items={[
+    { question: "Is the watermark an image?", answer: "The watermark is gray text, rotated across the page. Leave the field blank to download the pages without a stamp." },
+  ]}
+/>
+  </div>
+</BaseLayout>

@@ -1,14 +1,29 @@
+import type { MutableRefObject } from "react";
 import { useCallback } from "react";
 
-import type { pdfjs } from "@/lib/utils/pdf";
+import { normalizeQuarterTurn } from "@/lib/utils/pdf-geometry";
 
-import type { PDFManagerStoreType, PDFPageDataType } from "./types";
+import type {
+	PDFManagerMetaType,
+	PDFManagerStoreType,
+	PDFPageDataType,
+} from "./types";
+
+function canvasBlob(canvas: HTMLCanvasElement, type: string, quality: number) {
+	return new Promise<Blob | null>((resolve, reject) => {
+		try {
+			canvas.toBlob(resolve, type, quality);
+		} catch (error) {
+			reject(error);
+		}
+	});
+}
 
 export function usePDFManagerExtract(options: {
-	storeRef?: React.MutableRefObject<PDFManagerStoreType>;
-	mode?: "default" | "firstPageOnly" | "imagesOnly" | "textOnly";
+	storeRef?: MutableRefObject<PDFManagerStoreType>;
+	mode?: PDFManagerMetaType["mode"];
 }) {
-	const storeRef = options?.storeRef;
+	const storeRef = options.storeRef;
 
 	const extractThumbnail = useCallback(
 		(
@@ -16,61 +31,42 @@ export function usePDFManagerExtract(options: {
 			options?: {
 				maxDimension?: number;
 				quality?: number;
+				rotation?: number;
 			},
 		) => {
-			if (!storeRef?.current) {
-				throw new Error("Store Context Not Loaded");
+			const store = storeRef?.current;
+			if (!store) {
+				throw new Error("PDF store is not ready.");
 			}
 			const { id, index } = data;
-			const maxDimension = options?.maxDimension || 1200;
-			const quality = options?.quality || 0.8;
-
-			const { pdfDocumentProxy, pageThumbnailCache } =
-				storeRef.current[id] || {};
-			const pageThumbnailCacheKey = `${id}-${index}:${maxDimension}:${quality}`;
-			if (pageThumbnailCache?.[pageThumbnailCacheKey]) {
-				return pageThumbnailCache[pageThumbnailCacheKey];
+			const maxDimension = options?.maxDimension ?? 1200;
+			const quality = options?.quality ?? 0.8;
+			const rotation = normalizeQuarterTurn(options?.rotation ?? 0);
+			const entry = store[id];
+			const pageThumbnailCacheKey = `${id}-${index}:${maxDimension}:${quality}:${rotation}`;
+			const cached = entry?.pageThumbnailCache?.[pageThumbnailCacheKey];
+			if (cached) {
+				return cached;
 			}
-
-			if (!pdfDocumentProxy) {
-				throw new Error("PDF Document Not Loaded");
+			if (!entry?.pdfDocumentProxy) {
+				throw new Error("PDF document is not loaded.");
 			}
 
 			const thumbnailPromise = (async () => {
-				const pageProxy = await pdfDocumentProxy.getPage(index + 1);
-				const viewport = pageProxy.getViewport({ scale: 1 });
+				const pageProxy = await entry.pdfDocumentProxy.getPage(index + 1);
+				const base = pageProxy.getViewport({ scale: 1, rotation });
 				const scale =
-					Math.min(
-						maxDimension / viewport.width,
-						maxDimension / viewport.height,
-					) || 1;
-
-				const canvas = window.document.createElement("canvas");
-				canvas.height = viewport.height * scale;
-				canvas.width = viewport.width * scale;
-
-				await pageProxy.render({
-					canvas: canvas,
-					viewport: pageProxy.getViewport({ scale }),
-				}).promise;
-				const pageThumbnail = await new Promise<Blob | null>(
-					(resolve, reject) => {
-						try {
-							canvas.toBlob(resolve, "image/jpeg", quality);
-						} catch (error) {
-							reject(error);
-						}
-					},
-				);
-				return pageThumbnail;
+					Math.min(maxDimension / base.width, maxDimension / base.height) || 1;
+				const viewport = pageProxy.getViewport({ scale, rotation });
+				const canvas = document.createElement("canvas");
+				canvas.height = viewport.height;
+				canvas.width = viewport.width;
+				await pageProxy.render({ canvas, viewport }).promise;
+				return canvasBlob(canvas, "image/jpeg", quality);
 			})();
 
-			if (storeRef.current[id]) {
-				storeRef.current[id].pageThumbnailCache ??= {};
-				storeRef.current[id].pageThumbnailCache[pageThumbnailCacheKey] =
-					thumbnailPromise;
-			}
-
+			entry.pageThumbnailCache ??= {};
+			entry.pageThumbnailCache[pageThumbnailCacheKey] = thumbnailPromise;
 			return thumbnailPromise;
 		},
 		[storeRef],
@@ -84,98 +80,99 @@ export function usePDFManagerExtract(options: {
 				quality?: number;
 				imageIndex?: number;
 			},
-		): Promise<Blob | null> => {
-			if (!storeRef || !storeRef.current) {
-				throw new Error("Store Context Not Loaded");
+		) => {
+			const store = storeRef?.current;
+			if (!store) {
+				throw new Error("PDF store is not ready.");
 			}
-
 			const { id, index } = data;
-			const maxDimension = options?.maxDimension || 1200;
-			const quality = options?.quality || 0.8;
-			const imageIndex = options?.imageIndex || 0;
-
-			const { pdfDocumentProxy, pageThumbnailCache } =
-				storeRef.current[id] || {};
-			if (!pdfDocumentProxy) {
-				throw new Error("PDF Document Not Loaded");
+			const maxDimension = options?.maxDimension ?? 1200;
+			const quality = options?.quality ?? 0.8;
+			const imageIndex = options?.imageIndex ?? 0;
+			const entry = store[id];
+			if (!entry?.pdfDocumentProxy) {
+				throw new Error("PDF document is not loaded.");
 			}
 
-			const imgCacheKey = `${id}-${index}-${imageIndex || 0}:${maxDimension}:${quality}`;
-			if (pageThumbnailCache?.[imgCacheKey]) {
-				return await pageThumbnailCache[imgCacheKey];
+			const imgCacheKey = `${id}-${index}-${imageIndex}:${maxDimension}:${quality}`;
+			const cached = entry.pageThumbnailCache?.[imgCacheKey];
+			if (cached) {
+				return cached;
 			}
 
-			const { parsePDFEmbedImage } = await import("@/lib/utils/pdf");
-			const pdfPageProxy = await (
-				pdfDocumentProxy as pdfjs.PDFDocumentProxy
-			).getPage(index + 1);
-			const { argsArray } = await pdfPageProxy.getOperatorList();
-
-			const imgPromise = Promise.resolve(argsArray[imageIndex][0])
-				.then((imgFn) => {
-					if (!imgFn) {
-						throw new Error("Image Not Found");
-					}
-					return parsePDFEmbedImage(pdfPageProxy, imgFn);
-				})
-				.then((img) => {
-					if (!img) {
+			const imgPromise = (async () => {
+				const { readPDFEmbedImage } = await import("@/lib/utils/pdf-image");
+				const pdfPageProxy = await entry.pdfDocumentProxy.getPage(index + 1);
+				const img = await readPDFEmbedImage(pdfPageProxy, imageIndex);
+				if (!img) {
+					return null;
+				}
+				const scale =
+					Math.min(maxDimension / img.width, maxDimension / img.height) || 1;
+				const canvas = document.createElement("canvas");
+				canvas.width = Math.max(1, Math.round(img.width * scale));
+				canvas.height = Math.max(1, Math.round(img.height * scale));
+				const ctx = canvas.getContext("2d");
+				if (!ctx) {
+					return null;
+				}
+				if (img.bitmap) {
+					ctx.drawImage(img.bitmap, 0, 0, canvas.width, canvas.height);
+				} else if (img.data && img.data.length >= img.width * img.height * 4) {
+					const source = document.createElement("canvas");
+					source.width = img.width;
+					source.height = img.height;
+					const sourceCtx = source.getContext("2d");
+					if (!sourceCtx) {
 						return null;
 					}
+					const pixels = img.data.subarray(0, img.width * img.height * 4);
+					sourceCtx.putImageData(
+						new ImageData(new Uint8ClampedArray(pixels), img.width, img.height),
+						0,
+						0,
+					);
+					ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+				} else {
+					return null;
+				}
+				return canvasBlob(canvas, "image/png", quality);
+			})();
 
-					const scale =
-						Math.min(maxDimension / img.width, maxDimension / img.height) || 1;
-
-					const canvas = window.document.createElement("canvas");
-					canvas.height = img.height * scale;
-					canvas.width = img.width * scale;
-
-					const ctx = canvas.getContext("2d");
-					if (!ctx) {
-						return null;
-					}
-
-					if (img.bitmap) {
-						ctx.drawImage(img.bitmap, 0, 0, canvas.width, canvas.height);
-					} else if (img.data) {
-						ctx.putImageData(
-							new ImageData(
-								Uint8ClampedArray.from(img.data),
-								img.width,
-								img.height,
-							),
-							0,
-							0,
-						);
-						ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
-					} else {
-						return null;
-					}
-
-					return new Promise<Blob | null>((resolve, reject) => {
-						try {
-							canvas.toBlob(resolve, "image/png", quality);
-						} catch (error) {
-							reject(error);
-						}
-					});
-				});
-
-			if (storeRef.current[id]) {
-				storeRef.current[id].pageThumbnailCache ??= {};
-				storeRef.current[id].pageThumbnailCache[imgCacheKey] = imgPromise;
-			}
-
-			return await imgPromise;
+			entry.pageThumbnailCache ??= {};
+			entry.pageThumbnailCache[imgCacheKey] = imgPromise;
+			return imgPromise;
 		},
 		[storeRef],
 	);
 
-	const extractText = useCallback(async () => {}, []);
+	const extractText = useCallback(
+		async (data: Pick<PDFPageDataType, "id" | "index">) => {
+			const proxy = storeRef?.current?.[data.id]?.pdfDocumentProxy;
+			if (!proxy) {
+				throw new Error("PDF document is not loaded.");
+			}
+			const page = await proxy.getPage(data.index + 1);
+			const content = await page.getTextContent();
+			const lines: string[] = [];
+			let line = "";
+			for (const item of content.items) {
+				if (!("str" in item)) {
+					continue;
+				}
+				line += item.str;
+				if (item.hasEOL) {
+					lines.push(line);
+					line = "";
+				}
+			}
+			if (line) {
+				lines.push(line);
+			}
+			return lines.join("\n");
+		},
+		[storeRef],
+	);
 
-	return {
-		extractThumbnail,
-		extractImage,
-		extractText,
-	};
+	return { extractThumbnail, extractImage, extractText };
 }

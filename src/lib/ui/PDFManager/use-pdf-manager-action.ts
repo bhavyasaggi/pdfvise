@@ -1,20 +1,18 @@
-import type React from "react";
+import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { useCallback } from "react";
+
+import { toError } from "@/lib/utils/pdf-geometry";
+import { yieldToMain } from "@/lib/utils/schedule";
 
 import type { PDFManagerMetaType, PDFManagerStoreType } from "./types";
 
 import { getPDFManagerMeta } from "./utils";
 
 export function usePDFManagerAction(
-	_meta: PDFManagerMetaType,
-	setMeta: (
-		value:
-			| PDFManagerMetaType
-			| ((prev: PDFManagerMetaType) => PDFManagerMetaType),
-	) => void,
+	setMeta: Dispatch<SetStateAction<PDFManagerMetaType>>,
 	rootOptions?: {
-		storeRef?: React.MutableRefObject<PDFManagerStoreType>;
-		mode?: "default" | "firstPageOnly" | "imagesOnly" | "textOnly";
+		storeRef?: MutableRefObject<PDFManagerStoreType>;
+		mode?: PDFManagerMetaType["mode"];
 	},
 ) {
 	const storeRef = rootOptions?.storeRef;
@@ -22,49 +20,59 @@ export function usePDFManagerAction(
 
 	const add = useCallback(
 		async (file: File) => {
-			if (!storeRef || !storeRef.current) {
+			const store = storeRef?.current;
+			if (!store) {
 				return;
 			}
+			setMeta((prev) => ({
+				...prev,
+				isLoading: true,
+				error: undefined,
+				notice: undefined,
+			}));
+			await yieldToMain();
 			try {
-				setMeta((prev) => ({
-					...prev,
-					isLoading: true,
-				}));
-
 				const { parsePDFDocument } = await import("@/lib/utils/pdf");
-				const {
-					id: storeId,
-					pdfDocument,
-					pdfDocumentProxy,
-				} = await parsePDFDocument(file);
-				storeRef.current[storeId] = {
-					file,
-					pdfDocument,
-					pdfDocumentProxy,
+				const parsed = await parsePDFDocument(file);
+				const record = {
+					file: parsed.file,
+					pdfDocument: parsed.pdfDocument,
+					pdfDocumentProxy: parsed.pdfDocumentProxy,
 				};
-
 				const additionalMetaData = await getPDFManagerMeta(
-					{
-						[storeId]: {
-							file,
-							pdfDocument,
-							pdfDocumentProxy,
-						},
-					},
-					{ mode: mode },
+					{ [parsed.id]: record },
+					{ mode },
 				);
-
+				if (additionalMetaData.length === 0) {
+					await parsed.pdfDocumentProxy.destroy();
+					setMeta((prev) => ({
+						...prev,
+						isLoading: false,
+						notice: undefined,
+						error: new Error(
+							mode === "imagesOnly"
+								? "No images were found in this PDF."
+								: "This PDF has no pages.",
+						),
+					}));
+					return;
+				}
+				store[parsed.id] = record;
 				setMeta((prev) => ({
 					...prev,
 					isLoading: false,
-					data: [...(prev.data || []), ...additionalMetaData],
+					error: undefined,
+					notice: undefined,
+					data: [...(prev.data ?? []), ...additionalMetaData],
 				}));
 			} catch (error) {
-				console.error(error);
+				const nextError = toError(error);
+				console.error(nextError);
 				setMeta((prev) => ({
 					...prev,
 					isLoading: false,
-					error: error as Error,
+					notice: undefined,
+					error: nextError,
 				}));
 			}
 		},
@@ -73,21 +81,20 @@ export function usePDFManagerAction(
 
 	const remove = useCallback(
 		(fileOrId: File | string) => {
-			if (!storeRef || !storeRef.current) {
+			const store = storeRef?.current;
+			if (!store) {
 				return;
 			}
-			const removeId: string | undefined =
+			const removeId =
 				typeof fileOrId === "string"
 					? fileOrId
-					: Object.keys(storeRef.current).find(
-							(key) => storeRef.current[key]?.file === fileOrId,
-						);
-
+					: Object.keys(store).find((key) => store[key]?.file === fileOrId);
 			if (!removeId) {
 				return;
 			}
-
-			delete storeRef.current[removeId];
+			const removed = store[removeId];
+			delete store[removeId];
+			void removed?.pdfDocumentProxy.destroy();
 			setMeta((prev) => ({
 				...prev,
 				data: prev.data?.filter((item) => item.id !== removeId),
@@ -98,24 +105,18 @@ export function usePDFManagerAction(
 
 	const get = useCallback(
 		(fileOrId: File | string) => {
-			if (!storeRef || !storeRef.current) {
+			const store = storeRef?.current;
+			if (!store) {
 				return undefined;
 			}
-			const getId: string | undefined =
+			const getId =
 				typeof fileOrId === "string"
 					? fileOrId
-					: Object.keys(storeRef.current).find(
-							(key) => storeRef.current[key]?.file === fileOrId,
-						);
-			if (!getId) {
-				return undefined;
-			}
-
-			const item = storeRef.current[getId];
+					: Object.keys(store).find((key) => store[key]?.file === fileOrId);
+			const item = getId ? store[getId] : undefined;
 			if (!item) {
 				return undefined;
 			}
-
 			return {
 				file: item.file,
 				pdfDocument: item.pdfDocument,
@@ -125,9 +126,5 @@ export function usePDFManagerAction(
 		[storeRef],
 	);
 
-	return {
-		add,
-		remove,
-		get,
-	};
+	return { add, remove, get };
 }

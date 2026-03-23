@@ -1,0 +1,43 @@
+---
+import PageComingSoon from "@/components/PageComingSoon/index.astro";
+import SectionRibbon from "@/components/SectionRibbon/index.astro";
+import BaseLayout from "@/layouts/base.astro";
+
+export function getStaticPaths() {
+	const markets: Record<string, string> = {
+		ajio: "Ajio",
+		amazon: "Amazon",
+		flipkart: "Flipkart",
+		glowroad: "GlowRoad",
+		jiomart: "JioMart",
+		limeroad: "LimeRoad",
+		meesho: "Meesho",
+		myntra: "Myntra",
+		shopsy: "Shopsy",
+		snapdeal: "Snapdeal",
+	};
+	return Object.entries(markets).map(([market, name]) => ({
+		params: { market },
+		props: { name },
+	}));
+}
+
+const { name } = Astro.props;
+const description = `${name} shipping-label presets are not available yet. Crop any PDF in your browser with PDF Crop. Files are not uploaded.`;
+
+Astro.response.status = 503;
+Astro.response.statusText = "Service Unavailable";
+---
+
+<BaseLayout
+  title={`Crop ${name} shipping labels | PDFvise`}
+  description={description}
+  noindex
+>
+  <SectionRibbon title={`${name} shipping labels`} description={description} />
+  <PageComingSoon
+    note={`${name} label presets are not available yet. Crop any PDF to the margins you need.`}
+    href="/pdf-crop"
+    hrefLabel="Open PDF Crop"
+  />
+</BaseLayout>

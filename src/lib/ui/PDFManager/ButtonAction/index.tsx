@@ -1,5 +1,10 @@
-import type React from "react";
+import type { CSSProperties } from "preact";
+import type { ReactNode } from "react";
 import { useContext } from "react";
+
+import { toError } from "@/lib/utils/pdf-geometry";
+import { yieldToMain } from "@/lib/utils/schedule";
+
 import { PDFManagerActionContext, PDFManagerValueContext } from "../context";
 
 import styles from "../styles.module.scss";
@@ -11,9 +16,9 @@ export default function PDFManagerButtonAction(props: {
 	onClick?: (
 		data: PDFPageDataType[],
 	) => Promise<PDFPageDataType[]> | PDFPageDataType[];
-	children?: React.ReactNode;
+	children?: ReactNode;
 	className?: string;
-	style?: React.CSSProperties;
+	style?: CSSProperties;
 }) {
 	const { data, isLoading } = useContext(PDFManagerValueContext);
 	const { setMeta } = useContext(PDFManagerActionContext);
@@ -22,12 +27,31 @@ export default function PDFManagerButtonAction(props: {
 		if (isLoading || !props.onClick) {
 			return;
 		}
-		setMeta((prev) => ({ ...prev, isLoading: true }));
+		setMeta((prev) => ({
+			...prev,
+			isLoading: true,
+			error: undefined,
+			notice: undefined,
+		}));
+		await yieldToMain();
 		try {
 			const nextData = await props.onClick?.(data || []);
-			setMeta((prev) => ({ ...prev, isLoading: false, data: nextData }));
+			setMeta((prev) => ({
+				...prev,
+				isLoading: false,
+				error: undefined,
+				notice: undefined,
+				data: nextData,
+			}));
 		} catch (error) {
-			setMeta((prev) => ({ ...prev, isLoading: false, error: error as Error }));
+			const nextError = toError(error);
+			console.error(nextError);
+			setMeta((prev) => ({
+				...prev,
+				isLoading: false,
+				notice: undefined,
+				error: nextError,
+			}));
 		}
 	};
 

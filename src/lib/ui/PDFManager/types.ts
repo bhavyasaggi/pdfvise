@@ -1,3 +1,6 @@
+import type { PDFDocument } from "pdf-lib";
+import type { PDFDocumentProxy } from "pdfjs-dist";
+
 export type PDFPageDataType = {
 	/**
 	 * Id of the file
@@ -39,14 +42,38 @@ export type PDFPageDataType = {
 	 * Rotation of the page
 	 */
 	rotation: number;
+	/**
+	 * Mirror the page left to right before rotation.
+	 */
+	flipHorizontal?: boolean;
+	/**
+	 * Mirror the page top to bottom before rotation.
+	 */
+	flipVertical?: boolean;
+	/**
+	 * Extra top inset for this page, in points.
+	 */
+	marginTop?: number;
+	/**
+	 * Extra right inset for this page, in points.
+	 */
+	marginRight?: number;
+	/**
+	 * Extra bottom inset for this page, in points.
+	 */
+	marginBottom?: number;
+	/**
+	 * Extra left inset for this page, in points.
+	 */
+	marginLeft?: number;
 };
 
 export type PDFManagerStoreType = Record<
 	string,
 	{
 		file: File;
-		pdfDocument: pdflib.PDFDocument;
-		pdfDocumentProxy: pdfjs.PDFDocumentProxy;
+		pdfDocument: PDFDocument;
+		pdfDocumentProxy: PDFDocumentProxy;
 		pageThumbnailCache?: Record<string, Promise<Blob | null>>;
 	}
 >;
@@ -57,4 +84,6 @@ export type PDFManagerMetaType = {
 	isUninitialized: boolean;
 	isLoading: boolean;
 	error?: Error;
+	/** Shown after a finished download. Cleared when the next task starts. */
+	notice?: string;
 };

@@ -1,0 +1,65 @@
+---
+import SectionFaq from "@/components/SectionFaq/index.astro";
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
+import SectionRibbon from "@/components/SectionRibbon/index.astro";
+import SectionScanLazy from "@/components/SectionScan/lazy";
+import BaseLayout from "@/layouts/base.astro";
+---
+
+<BaseLayout
+  title="Scan images to PDF online for free. | PDFvise"
+  description="Turn camera photos or images into a PDF in your browser. Place the page corners, then download. Nothing is uploaded."
+>
+  <SectionRibbon
+    title="Scan PDF"
+    description="Turn photos of pages into a PDF."
+  />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionScanLazy client:load />
+    </div>
+    <SectionHowTo
+      title="How to scan images to a PDF?"
+      description="Turn camera photos or images into a PDF in your browser. You place the page corners, then download. Nothing is uploaded."
+    >
+      <ol>
+        <li>Use the camera, or add JPEG, PNG, or WebP images.</li>
+        <li>Drag the four corners around the page, then use the photo.</li>
+        <li>Re-order, rotate, or remove pages, and choose a filter.</li>
+        <li>Save & Download</li>
+      </ol>
+    </SectionHowTo>
+    <SectionFaq
+      items={[
+        {
+          question: "Do the photos leave my browser?",
+          answer:
+            "No. The camera photo or image is read in your browser, and the PDF is built there. Nothing is uploaded.",
+        },
+        {
+          question: "What if the camera does not start?",
+          answer:
+            "The camera needs a secure page, such as HTTPS or localhost. You can still add a JPEG, PNG, or WebP image.",
+        },
+        {
+          question: "How do I choose the page in the photo?",
+          answer:
+            "You place the four corners around the page. The tool flattens that outline. It does not find the page on its own.",
+        },
+        {
+          question: "Which images can I add?",
+          answer:
+            "JPEG, PNG, and WebP. You can add up to 30 pages, and each image can be up to 25 MB.",
+        },
+        {
+          question: "Can I copy the words in the photo?",
+          answer:
+            "No. Each PDF page is a picture. Text in the photo is not extracted, and it is not selectable.",
+        },
+      ]}
+    />
+  </div>
+</BaseLayout>

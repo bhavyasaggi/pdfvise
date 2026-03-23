@@ -1,19 +1,40 @@
 ---
-import PageComingSoon from "@/components/PageComingSoon/index.astro";
+import SectionFaq from "@/components/SectionFaq/index.astro";
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
+import SectionPDFExtractTextLazy from "@/components/SectionPDFExtractText/lazy";
 import SectionRibbon from "@/components/SectionRibbon/index.astro";
 import BaseLayout from "@/layouts/base.astro";
-
-Astro.response.status = 503;
-Astro.response.statusText = "Service Unavailable";
 ---
 
 <BaseLayout
-  title="Extract Text from PDF files online for free. | PDFvise"
-  description="Extract all Text from a PDF file online without uploading, with no watermarks, & completely free! Extract Text from PDF files easily on your browser only!"
+  title="Extract text from PDF files online for free. | PDFvise"
+  description="Extract the text layer from a PDF online without uploading, with no watermarks, and completely free. Read embedded text in your browser."
 >
   <SectionRibbon
     title="Extract PDF Text"
-    description="Extract all Text from a PDF file."
+    description="Read the text layer already stored in the PDF."
   />
-  <PageComingSoon />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionPDFExtractTextLazy client:load />
+    </div>
+    <SectionHowTo
+      title="How to extract text from a PDF?"
+      description="Extract embedded text online without uploading. Scanned pages without a text layer come back empty."
+    >
+      <ol>
+        <li>Select PDF files</li>
+        <li>Remove any pages you want to skip</li>
+        <li>Save & Download a text file, or a zip when you selected more than one PDF</li>
+      </ol>
+    </SectionHowTo>
+    <SectionFaq
+  items={[
+    { question: "Does this recognize text in a scan?", answer: "PDFvise reads the text the PDF already contains. A scan that is only an image has no text layer, so that page is empty in the download." },
+  ]}
+/>
+  </div>
 </BaseLayout>

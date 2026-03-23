@@ -2,9 +2,11 @@ import React, { useContext, useEffect, useState } from "react";
 import { SortableKnob } from "react-easy-sort";
 import { useIntersectionObserver } from "@/lib/hooks/use-intersection-observer";
 import Icon from "@/lib/ui/Icon";
-import { PDFManagerActionContext } from "../context";
+import { PDFManagerActionContext, PDFManagerValueContext } from "../context";
 import styles from "../styles.module.scss";
 import type { PDFPageDataType } from "../types";
+
+type PreviewPhase = "waiting" | "loading" | "ready" | "empty" | "error";
 
 const ViewImage = React.forwardRef(function ViewImageRaw(
 	props: {
@@ -15,37 +17,43 @@ const ViewImage = React.forwardRef(function ViewImageRaw(
 	},
 	ref,
 ) {
-	const [loading, setLoading] = useState(true);
+	const [phase, setPhase] = useState<PreviewPhase>("waiting");
 	const [thumbnail, setThumbnail] = useState<string | undefined>(undefined);
 
 	const [refIntersectionObserver, isIntersecting] = useIntersectionObserver();
 
+	const { data } = useContext(PDFManagerValueContext);
 	const { get, extractImage, setMeta } = useContext(PDFManagerActionContext);
+	const isLast = !data || props.index >= data.length - 1;
 
 	useEffect(() => {
-		let isStale = false;
-		if (isIntersecting) {
-			extractImage(props.pdfPage, {
-				maxDimension: 128,
-				quality: 0.6,
-				imageIndex: props.imageIndex,
-			})
-				.then((thumbnailBlob) => {
-					if (!isStale) {
-						setThumbnail(
-							thumbnailBlob ? URL.createObjectURL(thumbnailBlob) : undefined,
-						);
-						setLoading(false);
-					}
-				})
-				.catch((error) => {
-					console.error(error);
-					if (!isStale) {
-						setThumbnail(undefined);
-						setLoading(false);
-					}
-				});
+		if (!isIntersecting) {
+			setPhase("waiting");
+			return;
 		}
+		let isStale = false;
+		setPhase("loading");
+		extractImage(props.pdfPage, {
+			maxDimension: 128,
+			quality: 0.6,
+			imageIndex: props.imageIndex,
+		})
+			.then((thumbnailBlob) => {
+				if (isStale) {
+					return;
+				}
+				setThumbnail(
+					thumbnailBlob ? URL.createObjectURL(thumbnailBlob) : undefined,
+				);
+				setPhase(thumbnailBlob ? "ready" : "empty");
+			})
+			.catch((error: unknown) => {
+				console.error(error);
+				if (!isStale) {
+					setThumbnail(undefined);
+					setPhase("error");
+				}
+			});
 		return () => {
 			isStale = true;
 		};
@@ -71,6 +79,7 @@ const ViewImage = React.forwardRef(function ViewImageRaw(
 					height={16}
 					width={16}
 					title={file?.name || "File"}
+					decorative
 					className={styles.cardViewItemHeaderIcon}
 				/>
 				<small
@@ -84,24 +93,29 @@ const ViewImage = React.forwardRef(function ViewImageRaw(
 				ref={refIntersectionObserver}
 				className={styles.cardViewItemThumbnailFigure}
 			>
-				{loading ? (
-					<Icon
-						icon="loader"
-						height={128}
-						width={128}
-						title="Loading"
-						className={styles.cardViewItemThumbnail}
-					/>
-				) : (
+				{phase === "ready" && thumbnail ? (
 					<img
-						src={thumbnail || ""}
+						src={thumbnail}
 						alt={pageString}
 						width={128}
 						height={128}
 						className={styles.cardViewItemThumbnail}
-						style={{
-							transform: `rotate(${props.pdfPage.rotation || 0}deg)`,
-						}}
+					/>
+				) : (
+					<Icon
+						icon={phase === "loading" ? "loader" : "image"}
+						height={128}
+						width={128}
+						title={
+							phase === "loading"
+								? "Loading preview"
+								: phase === "error"
+									? "Preview failed"
+									: phase === "empty"
+										? "No preview"
+										: "Preview pending"
+						}
+						className={styles.cardViewItemThumbnail}
 					/>
 				)}
 				<figcaption className={styles.cardViewItemThumbnailFigureCaption}>
@@ -109,18 +123,97 @@ const ViewImage = React.forwardRef(function ViewImageRaw(
 				</figcaption>
 			</figure>
 			<div className={styles.cardViewItemButtonGroup}>
+				<button
+					type="button"
+					disabled={props.disabled || props.index === 0}
+					className={`outline secondary ${styles.cardViewItemButton}`}
+					aria-label="Move earlier"
+					onClick={() => {
+						setMeta((prev) => {
+							const data = [...(prev.data || [])];
+							const nextIndex = props.index - 1;
+							const current = data[props.index];
+							const neighbor = data[nextIndex];
+							if (current === undefined || neighbor === undefined) {
+								return prev;
+							}
+							data[props.index] = neighbor;
+							data[nextIndex] = current;
+							return { ...prev, data };
+						});
+					}}
+				>
+					<Icon
+						icon="chevron-up"
+						height={16}
+						width={16}
+						title="Move earlier"
+						decorative
+					/>
+				</button>
+				<button
+					type="button"
+					disabled={props.disabled || isLast}
+					className={`outline secondary ${styles.cardViewItemButton}`}
+					aria-label="Move later"
+					onClick={() => {
+						setMeta((prev) => {
+							const data = [...(prev.data || [])];
+							const nextIndex = props.index + 1;
+							const current = data[props.index];
+							const neighbor = data[nextIndex];
+							if (current === undefined || neighbor === undefined) {
+								return prev;
+							}
+							data[props.index] = neighbor;
+							data[nextIndex] = current;
+							return { ...prev, data };
+						});
+					}}
+				>
+					<Icon
+						icon="chevron-down"
+						height={16}
+						width={16}
+						title="Move later"
+						decorative
+					/>
+				</button>
 				<SortableKnob>
 					<button
 						type="button"
 						disabled={props.disabled}
 						className={`outline secondary ${styles.cardViewItemButton}`}
-						aria-label="Move"
+						aria-label="Drag to reorder"
+						onKeyDown={(event) => {
+							if (event.key !== "ArrowUp" && event.key !== "ArrowDown") {
+								return;
+							}
+							event.preventDefault();
+							const delta = event.key === "ArrowUp" ? -1 : 1;
+							setMeta((prev) => {
+								const data = [...(prev.data || [])];
+								const nextIndex = props.index + delta;
+								const current = data[props.index];
+								const neighbor = data[nextIndex];
+								if (current === undefined || neighbor === undefined) {
+									return prev;
+								}
+								data[props.index] = neighbor;
+								data[nextIndex] = current;
+								return { ...prev, data };
+							});
+						}}
 					>
-						<Icon icon="move" height={16} width={16} title="Move" />
+						<Icon
+							icon="move"
+							height={16}
+							width={16}
+							title="Drag to reorder"
+							decorative
+						/>
 					</button>
 				</SortableKnob>
-				<div />
-				<div />
 				<button
 					type="button"
 					disabled={props.disabled}
@@ -137,7 +230,13 @@ const ViewImage = React.forwardRef(function ViewImageRaw(
 						});
 					}}
 				>
-					<Icon icon="trash-2" height={16} width={16} title="Remove" />
+					<Icon
+						icon="trash-2"
+						height={16}
+						width={16}
+						title="Remove"
+						decorative
+					/>
 				</button>
 			</div>
 		</div>

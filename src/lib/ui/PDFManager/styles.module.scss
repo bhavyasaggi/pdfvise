@@ -18,7 +18,8 @@
 .cardViewItem {
   display: inline-block;
   width: 148px;
-  height: 212px;
+  height: auto;
+  min-height: 212px;
   margin: 4px;
   border: var(--pico-border-width) solid var(--pico-muted-border-color);
   border-radius: var(--pico-border-radius);
@@ -107,4 +108,108 @@
 .cardViewItemButtonDel {
   --pico-color: var(--pico-del-color) !important;
   --pico-border-color: var(--pico-del-color) !important;
+}
+
+.cardViewItemFrame {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 128px;
+  height: 128px;
+  margin: 0 auto;
+}
+
+.cardViewItemThumbnailFit {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.pageEditDialog {
+  box-sizing: border-box;
+  width: min(24rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: var(--pico-spacing);
+  overflow: auto;
+  border: var(--pico-border-width) solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-background-color);
+  color: var(--pico-color);
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  input[type="checkbox"] {
+    width: auto;
+    height: auto;
+    margin: 0;
+  }
+}
+
+.pageEditTitle {
+  margin: 0 0 var(--pico-spacing);
+  font-size: 1.25rem;
+}
+
+.pageEditFieldset {
+  width: 100%;
+  min-width: 0;
+  margin: 0 0 var(--pico-spacing);
+  padding: 0;
+  border: 0;
+
+  legend {
+    margin-bottom: calc(0.4 * var(--pico-spacing));
+    padding: 0;
+    font-weight: 600;
+  }
+}
+
+.pageEditField {
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.2 * var(--pico-spacing));
+  min-width: 0;
+  margin: 0 0 calc(0.6 * var(--pico-spacing));
+}
+
+.pageEditChecks {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(0.4 * var(--pico-spacing));
+}
+
+.pageEditCheck {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: calc(0.4 * var(--pico-spacing));
+  width: auto;
+  margin: 0;
+}
+
+.pageEditMargins {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(0.5 * var(--pico-spacing));
+  margin-bottom: calc(0.6 * var(--pico-spacing));
+
+  .pageEditField {
+    margin: 0;
+  }
+}
+
+.pageEditHint {
+  margin: 0;
+  color: var(--pico-muted-color);
+  font-size: 0.875rem;
+}
+
+.pageEditClose {
+  width: 100%;
 }

@@ -1,10 +1,11 @@
 import type { FeatherIconNames } from "feather-icons";
 import FeatherSprite from "feather-icons/dist/feather-sprite.svg?url";
-import type React from "react";
+import type { CSSProperties } from "preact";
 
 export interface IconProps {
 	readonly title: string;
 	readonly icon: FeatherIconNames;
+	readonly decorative?: boolean;
 	readonly width?: string | number;
 	readonly height?: string | number;
 	readonly viewBox?: string;
@@ -14,12 +15,13 @@ export interface IconProps {
 	readonly strokeLinecap?: "round" | "square";
 	readonly strokeLinejoin?: "bevel" | "miter" | "round";
 	readonly className?: string;
-	readonly style?: React.CSSProperties;
+	readonly style?: CSSProperties;
 }
 
 export default function Icon({
 	title,
 	icon,
+	decorative,
 	width,
 	height,
 	viewBox,
@@ -33,15 +35,17 @@ export default function Icon({
 }: IconProps) {
 	return (
 		<svg
+			aria-hidden={decorative ? true : undefined}
 			className={className}
 			fill={fill ?? "none"}
+			focusable="false"
 			height={height ?? 24}
 			stroke={stroke ?? "currentColor"}
-			stroke-linecap={strokeLinecap ?? "round"}
-			stroke-linejoin={strokeLinejoin ?? "round"}
-			stroke-width={strokeWidth ?? 2}
+			strokeLinecap={strokeLinecap ?? "round"}
+			strokeLinejoin={strokeLinejoin ?? "round"}
+			strokeWidth={strokeWidth ?? 2}
 			style={style}
-			view-box={viewBox ?? "0 0 24 24"}
+			viewBox={viewBox ?? "0 0 24 24"}
 			width={width ?? 24}
 		>
 			<title>{title || `icon ${icon || "??"}`}</title>

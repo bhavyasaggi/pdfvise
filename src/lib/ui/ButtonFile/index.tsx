@@ -1,53 +1,62 @@
-import type React from "react";
+import type { CSSProperties } from "preact";
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef } from "react";
 
 export default function ButtonFile(props: {
 	disabled?: boolean;
-	children?: React.ReactNode;
+	accept?: string;
+	multiple?: boolean;
+	capture?: "environment" | "user";
+	inputRef?: { current: HTMLInputElement | null };
+	children?: ReactNode;
 	onChange?: (files: File[]) => Promise<void> | void;
 	className?: string;
-	style?: React.CSSProperties;
+	style?: CSSProperties;
 }) {
 	const inputRef = useRef<HTMLInputElement>(null);
+	const externalRef = props.inputRef;
+	const onChange = props.onChange;
+	const accept = props.accept ?? "application/pdf";
+	const multiple = props.multiple ?? false;
+	const capture = props.capture;
 
-	const inputAddListener: React.ChangeEventHandler<HTMLInputElement> =
-		useCallback(
-			async (e) => {
-				// @ts-expect-error e.target is not null
-				const files: FileList | null | undefined = e.target?.files;
-				await props.onChange?.(
-					Array.from(files || []).map(
-						(file) => new File([file], file.name, { type: file.type }),
-					),
-				);
-				// @ts-expect-error e.target is not null
-				e.target.value = "";
-			},
-			[props.onChange],
-		);
+	const onInput = useCallback(
+		async (event: Event) => {
+			const input = event.currentTarget;
+			if (!(input instanceof HTMLInputElement)) {
+				return;
+			}
+			const files = Array.from(input.files ?? []);
+			input.value = "";
+			await onChange?.(files);
+		},
+		[onChange],
+	);
 
 	useEffect(() => {
-		// biome-ignore lint/suspicious/noExplicitAny: Transformation Error
-		const memoryInputListener = inputAddListener as any;
-		const memoryInput = document.createElement("input");
-		memoryInput.type = "file";
-		memoryInput.accept = "application/pdf";
-		Object.assign(memoryInput.style, {
-			display: "none",
-			position: "absolute",
-			top: 0,
-			left: 0,
-			height: 0,
-			width: 0,
-			opacity: 0,
-			zIndex: -1,
-		});
-		memoryInput.addEventListener("change", memoryInputListener);
-		inputRef.current = memoryInput;
+		const input = document.createElement("input");
+		input.type = "file";
+		input.accept = accept;
+		input.multiple = multiple;
+		// A camera capture and a multi-file picker do not combine.
+		if (capture && !multiple) {
+			input.setAttribute("capture", capture);
+		}
+		input.hidden = true;
+		input.addEventListener("change", onInput);
+		document.body.append(input);
+		inputRef.current = input;
+		if (externalRef) {
+			externalRef.current = input;
+		}
 		return () => {
-			memoryInput.removeEventListener("change", memoryInputListener);
+			input.removeEventListener("change", onInput);
+			input.remove();
+			if (externalRef?.current === input) {
+				externalRef.current = null;
+			}
 		};
-	}, [inputAddListener]);
+	}, [accept, capture, externalRef, multiple, onInput]);
 
 	return (
 		<button

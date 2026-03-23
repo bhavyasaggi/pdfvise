@@ -1,9 +1,10 @@
-import type React from "react";
+import type { CSSProperties } from "preact";
+import type { ReactNode } from "react";
 
 export default function Card(props: {
-	children?: React.ReactNode;
+	children?: ReactNode;
 	className?: string;
-	style?: React.CSSProperties;
+	style?: CSSProperties;
 }) {
 	return (
 		<div

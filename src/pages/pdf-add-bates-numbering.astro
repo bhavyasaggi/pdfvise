@@ -1,19 +1,40 @@
 ---
-import PageComingSoon from "@/components/PageComingSoon/index.astro";
+import SectionFaq from "@/components/SectionFaq/index.astro";
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
+import SectionPDFPagesLazy from "@/components/SectionPDFPages/lazy";
 import SectionRibbon from "@/components/SectionRibbon/index.astro";
 import BaseLayout from "@/layouts/base.astro";
-
-Astro.response.status = 503;
-Astro.response.statusText = "Service Unavailable";
 ---
 
 <BaseLayout
-  title="PDF files online for free. | PDFvise"
-  description="PDF file online without uploading, with no watermarks, & completely free! PDF files easily on your browser only!"
+  title="Add Bates numbers to a PDF online for free. | PDFvise"
+  description="Add Bates numbers to a PDF online without uploading, with no watermarks, and completely free. Stamp Bates numbers in your browser."
 >
   <SectionRibbon
-    title="PDF"
-    description="PDF file."
+    title="Add Bates Numbers"
+    description="Stamp an incrementing number on every page."
   />
-  <PageComingSoon />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionPDFPagesLazy tool="bates" client:load />
+    </div>
+    <SectionHowTo
+      title="How to add Bates numbers?"
+      description="Add Bates numbers online without uploading. The stamp is drawn in your browser."
+    >
+      <ol>
+        <li>Select PDF files</li>
+        <li>Set the prefix and the first number</li>
+        <li>Save & Download</li>
+      </ol>
+    </SectionHowTo>
+    <SectionFaq
+  items={[
+    { question: "Where does the number appear?", answer: "The prefix and number are drawn at the top right of each page, in the order of the pages you keep." },
+  ]}
+/>
+  </div>
 </BaseLayout>

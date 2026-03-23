@@ -1,4 +1,5 @@
 ---
+import SectionFaq from "@/components/SectionFaq/index.astro";
 import SectionHowTo from "@/components/SectionHowTo/index.astro";
 import SectionPDFPagesLazy from "@/components/SectionPDFPages/lazy";
 import SectionRibbon from "@/components/SectionRibbon/index.astro";
@@ -15,7 +16,7 @@ import BaseLayout from "@/layouts/base.astro";
     style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
   >
     <div style="margin-bottom: calc(3 * var(--pico-spacing));">
-      <SectionPDFPagesLazy client:load />
+      <SectionPDFPagesLazy tool="n-up" client:load />
     </div>
     <SectionHowTo
       title="How to N-Up multiple PDF files together?"
@@ -27,50 +28,13 @@ import BaseLayout from "@/layouts/base.astro";
         <li>Save & Download</li>
       </ol>
     </SectionHowTo>
-    <section class="container">
-      <h2 style="text-align: center; color: var(--pico-primary);">
-        Frequently Asked Questions
-      </h2>
-      <details open>
-        <summary>
-          <strong>How many PDF files I can N-Up at once with PDFvise?</strong>
-        </summary>
-        <p>
-          PDFvise can N-Up multiple files into one PDF without any limitation.
-          There is no size or count limit on PDF files to be N-Upd.
-        </p>
-      </details>
-      <hr />
-      <details open>
-        <summary>
-          <strong>Can I N-Up PDF and rotate pages?</strong>
-        </summary>
-        <p>
-          After selecting multiple files, you can rotate all pages of the PDF on
-          PDFvise.
-        </p>
-      </details>
-      <hr />
-      <details open>
-        <summary>
-          <strong>Can I N-Up PDF and add margin?</strong>
-        </summary>
-        <p>
-          After selecting multiple files on PDFvise, you can add margins to all
-          pages of the PDF.
-        </p>
-      </details>
-      <hr />
-      <details open>
-        <summary>
-          <strong>Where are PDF files saved after merging?</strong>
-        </summary>
-        <p>
-          Respecting your privacy, PDFvise uploads no files to any secondary
-          location. All files are only available at your browser and your
-          system.
-        </p>
-      </details>
-    </section>
+    <SectionFaq
+  items={[
+    { question: "How many PDF files I can N-Up at once with PDFvise?", answer: "PDFvise can place several files on shared sheets. There is no count limit. A single PDF can be up to 100 MB." },
+    { question: "Can I N-Up PDF and rotate pages?", answer: "After selecting multiple files, you can rotate all pages of the PDF on PDFvise." },
+    { question: "Can I N-Up PDF and add margin?", answer: "After selecting multiple files on PDFvise, you can add margins to all pages of the PDF." },
+    { question: "Where are PDF files saved after merging?", answer: "Respecting your privacy, PDFvise uploads no files to any secondary location. All files are only available at your browser and your system." },
+  ]}
+/>
   </div>
 </BaseLayout>

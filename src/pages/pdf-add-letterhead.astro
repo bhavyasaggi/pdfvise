@@ -1,19 +1,40 @@
 ---
-import PageComingSoon from "@/components/PageComingSoon/index.astro";
+import SectionFaq from "@/components/SectionFaq/index.astro";
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
+import SectionPDFPagesLazy from "@/components/SectionPDFPages/lazy";
 import SectionRibbon from "@/components/SectionRibbon/index.astro";
 import BaseLayout from "@/layouts/base.astro";
-
-Astro.response.status = 503;
-Astro.response.statusText = "Service Unavailable";
 ---
 
 <BaseLayout
-  title="PDF files online for free. | PDFvise"
-  description="PDF file online without uploading, with no watermarks, & completely free! PDF files easily on your browser only!"
+  title="Add a letterhead to a PDF online for free. | PDFvise"
+  description="Add a text letterhead to a PDF online without uploading, with no watermarks, and completely free. Stamp a header in your browser."
 >
   <SectionRibbon
-    title="PDF"
-    description="PDF file."
+    title="Add Letterhead"
+    description="Center a line of text at the top of every page."
   />
-  <PageComingSoon />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionPDFPagesLazy tool="letterhead" client:load />
+    </div>
+    <SectionHowTo
+      title="How to add a letterhead?"
+      description="Add a text header online without uploading. The line is drawn in your browser."
+    >
+      <ol>
+        <li>Select PDF files</li>
+        <li>Type the header. Leave it blank to download the pages unchanged</li>
+        <li>Save & Download</li>
+      </ol>
+    </SectionHowTo>
+    <SectionFaq
+  items={[
+    { question: "Can I place a logo?", answer: "This tool draws one line of text at the top of each page." },
+  ]}
+/>
+  </div>
 </BaseLayout>

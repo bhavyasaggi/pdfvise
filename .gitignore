@@ -24,6 +24,7 @@ out
 .react-router
 .branches
 .temp
+.playwright-mcp
 
 # misc
 .Trashes

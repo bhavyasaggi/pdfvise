@@ -1,0 +1,33 @@
+---
+import SectionGenerateLazy from "@/components/SectionGenerate/lazy";
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
+import SectionRibbon from "@/components/SectionRibbon/index.astro";
+import BaseLayout from "@/layouts/base.astro";
+---
+
+<BaseLayout
+  title="Create a resume PDF online for free. | PDFvise"
+  description="Create a resume PDF online without uploading, with no watermarks, and completely free. The PDF is built in your browser."
+>
+  <SectionRibbon
+    title="Resume"
+    description="Write a one-page resume and download a PDF."
+  />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionGenerateLazy kind="resume" client:load />
+    </div>
+    <SectionHowTo
+      title="How to create a resume?"
+      description="Create a resume PDF in your browser. Nothing is uploaded."
+    >
+      <ol>
+        <li>Enter your name, contact details, and experience</li>
+        <li>Save & Download</li>
+      </ol>
+    </SectionHowTo>
+  </div>
+</BaseLayout>

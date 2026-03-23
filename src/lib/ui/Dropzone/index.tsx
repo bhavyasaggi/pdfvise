@@ -1,66 +1,107 @@
-import type React from "react";
+import type { CSSProperties, TargetedDragEvent } from "preact";
+import type { ReactNode } from "react";
+
+function filesFromList(
+	list: FileList | DataTransferItemList | null | undefined,
+) {
+	if (!list) {
+		return [];
+	}
+	const files: File[] = [];
+	if (list instanceof FileList) {
+		for (const file of Array.from(list)) {
+			files.push(file);
+		}
+		return files;
+	}
+	for (const item of Array.from(list)) {
+		if (item.kind !== "file") {
+			continue;
+		}
+		const file = item.getAsFile();
+		if (file) {
+			files.push(file);
+		}
+	}
+	return files;
+}
 
 export default function Dropzone(props: {
 	id?: string;
 	name?: string;
 	disabled?: boolean;
+	accept?: string;
+	multiple?: boolean;
 	onChange?: (files: File[]) => Promise<void> | void;
-	children?: React.ReactNode;
+	label?: string;
+	children?: ReactNode;
 	className?: string;
-	style?: React.CSSProperties;
+	style?: CSSProperties;
 }) {
+	const accept = props.accept ?? "application/pdf";
+	const multiple = props.multiple ?? true;
+
+	const onDragOver = (event: TargetedDragEvent<HTMLLabelElement>) => {
+		if (props.disabled || !event.dataTransfer) {
+			return;
+		}
+		const hasNonFileItems = Array.from(event.dataTransfer.items).some(
+			(item) => item.kind !== "file",
+		);
+		if (!hasNonFileItems) {
+			event.preventDefault();
+			event.dataTransfer.dropEffect = "copy";
+		}
+	};
+
+	const onDrop = async (event: TargetedDragEvent<HTMLLabelElement>) => {
+		if (props.disabled) {
+			return;
+		}
+		event.preventDefault();
+		const files = filesFromList(event.dataTransfer?.items);
+		if (files.length > 0) {
+			await props.onChange?.(multiple ? files : files.slice(0, 1));
+		}
+	};
+
 	return (
 		<label
-			onDragOver={(e) => {
-				const hasNonFileItems = Array.prototype.some.call(
-					e.dataTransfer.items,
-					(item) => item.kind !== "file",
-				);
-				if (!hasNonFileItems) {
-					e.preventDefault();
-					e.dataTransfer.dropEffect = "copy";
-				}
-			}}
-			onDrop={async (e) => {
-				e.preventDefault();
-				// e.dataTransfer.dropEffect = "copy";
-
-				const fileItems: File[] = [];
-				Array.prototype.forEach.call(e.dataTransfer.items, (item) => {
-					if (item.kind === "file") {
-						const itemFile = item.getAsFile();
-						if (itemFile) {
-							fileItems.push(itemFile);
-						}
-					}
-				});
-				await props.onChange?.(fileItems);
-			}}
+			onDragOver={onDragOver}
+			onDrop={onDrop}
 			className={props.className}
-			style={props.style}
+			style={{ position: "relative", ...props.style }}
 		>
 			{props.children}
 			<input
 				id={props.id}
 				name={props.name}
 				type="file"
+				accept={accept}
+				multiple={multiple}
 				disabled={props.disabled}
-				onChange={async (e) => {
-					const files = Array.from(e.target.files || []).map(
-						(file) => new File([file], file.name, { type: file.type }),
-					);
+				aria-label={
+					props.label ?? (multiple ? "Add PDF files" : "Add a PDF file")
+				}
+				onChange={async (event) => {
+					const input = event.currentTarget;
+					if (!(input instanceof HTMLInputElement)) {
+						return;
+					}
+					const files = filesFromList(input.files);
+					input.value = "";
 					await props.onChange?.(files);
-					e.target.value = "";
 				}}
 				style={{
-					display: "none",
 					position: "absolute",
-					zIndex: -1,
-					top: 0,
-					left: 0,
-					height: 0,
-					width: 0,
-					opacity: 0,
+					width: "1px",
+					height: "1px",
+					padding: 0,
+					margin: "-1px",
+					overflow: "hidden",
+					clip: "rect(0, 0, 0, 0)",
+					whiteSpace: "nowrap",
+					border: 0,
 				}}
 			/>
 		</label>

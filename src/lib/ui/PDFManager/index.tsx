@@ -22,13 +22,13 @@ function PDFManager(props: {
 
 	const [meta, setMeta] = usePDFManagerMeta({ storeRef, mode: props.mode });
 
-	const { add, remove, get } = usePDFManagerAction(meta, setMeta, {
-		storeRef: storeRef,
+	const { add, remove, get } = usePDFManagerAction(setMeta, {
+		storeRef,
 		mode: props.mode,
 	});
 
-	const { extractImage, extractThumbnail } = usePDFManagerExtract({
-		storeRef: storeRef,
+	const { extractImage, extractThumbnail, extractText } = usePDFManagerExtract({
+		storeRef,
 		mode: props.mode,
 	});
 
@@ -41,6 +41,7 @@ function PDFManager(props: {
 				setMeta,
 				extractImage,
 				extractThumbnail,
+				extractText,
 			}}
 		>
 			<PDFManagerValueContext.Provider value={meta}>

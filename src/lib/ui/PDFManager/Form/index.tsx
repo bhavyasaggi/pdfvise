@@ -1,98 +1,124 @@
-import type React from "react";
+import type { CSSProperties } from "preact";
+import type { ReactNode } from "react";
 import { useContext } from "react";
+
 import ButtonFile from "@/lib/ui/ButtonFile";
 import Icon from "@/lib/ui/Icon";
+import { toError } from "@/lib/utils/pdf-geometry";
+import { yieldToMain } from "@/lib/utils/schedule";
 
-import { PDFManagerActionContext, PDFManagerValueContext } from "../context";
+import {
+	PDFManagerActionContext,
+	type PDFManagerActions,
+	PDFManagerValueContext,
+} from "../context";
 import styles from "../styles.module.scss";
 import type { PDFPageDataType } from "../types";
 
-export interface PDFMangerFormProps {
+export interface PDFManagerFormProps {
 	onSubmit?: (
 		data?: PDFPageDataType[],
 		formData?: FormData,
-		utils?: Partial<
-			React.ComponentProps<typeof PDFManagerActionContext.Provider>["value"]
+		utils?: Pick<
+			PDFManagerActions,
+			"get" | "extractImage" | "extractThumbnail" | "extractText"
 		>,
 	) => Promise<void>;
 	onReset?: () => void;
-	children?: React.ReactNode;
+	children?: ReactNode;
 	className?: string;
-	style?: React.CSSProperties;
+	style?: CSSProperties;
 }
 
-export default function PDFManagerForm(props: PDFMangerFormProps) {
+export default function PDFManagerForm(props: PDFManagerFormProps) {
 	const { data, isUninitialized, isLoading } = useContext(
 		PDFManagerValueContext,
 	);
-	const { get, add, setMeta, extractImage, extractThumbnail } = useContext(
-		PDFManagerActionContext,
-	);
+	const { get, add, setMeta, extractImage, extractThumbnail, extractText } =
+		useContext(PDFManagerActionContext);
+	const blocked = isUninitialized || isLoading || !data?.length;
 
 	return (
 		<form
-			onSubmit={async (e) => {
+			onSubmit={async (event) => {
+				event.preventDefault();
+				const form = event.currentTarget;
+				setMeta((prev) => ({
+					...prev,
+					isLoading: true,
+					error: undefined,
+					notice: undefined,
+				}));
+				await yieldToMain();
 				try {
-					e.preventDefault();
-					setMeta((prev) => ({ ...prev, isLoading: true }));
-
-					const formData = new FormData(e.currentTarget);
+					const formData = new FormData(form);
 					await props.onSubmit?.(data, formData, {
 						get,
 						extractImage,
 						extractThumbnail,
+						extractText,
 					});
-
-					setMeta((prev) => ({ ...prev, isLoading: false, data: [] }));
+					setMeta((prev) => ({
+						...prev,
+						isLoading: false,
+						error: undefined,
+						notice: "Saved. The download has started.",
+					}));
 				} catch (error) {
-					console.error(error);
-					globalThis.alert(
-						`Error: ${(error as Error)?.message || "Unknown error"}`,
-					);
+					const nextError = toError(error);
+					console.error(nextError);
+					setMeta((prev) => ({
+						...prev,
+						isLoading: false,
+						notice: undefined,
+						error: nextError,
+					}));
 				}
 			}}
-			onReset={(e) => {
-				try {
-					e.preventDefault();
-					e.currentTarget.reset();
-					props.onReset?.();
-					setMeta((prev) => ({ ...prev, isLoading: false, data: [] }));
-				} catch (error) {
-					console.error(error);
-					globalThis.alert(
-						`Error: ${(error as Error)?.message || "Unknown error"}`,
-					);
-				}
+			onReset={(event) => {
+				event.preventDefault();
+				event.currentTarget.reset();
+				props.onReset?.();
+				setMeta((prev) => ({
+					...prev,
+					isLoading: false,
+					error: undefined,
+					notice: undefined,
+					data: [],
+				}));
 			}}
 			className={[styles.formContainer, props.className]
 				.filter(Boolean)
 				.join(" ")}
 			style={props.style}
 		>
-			<button
-				type="submit"
-				disabled={isUninitialized || isLoading}
-				className={styles.formButton}
-			>
+			<button type="submit" disabled={blocked} className={styles.formButton}>
 				<Icon
 					icon="download-cloud"
 					height={16}
 					width={16}
 					title="Save and Download"
+					decorative
 				/>
 				<span>Save & Download</span>
 			</button>
 			<ButtonFile
+				multiple
 				disabled={isUninitialized || isLoading}
 				className={["outline", styles.formButton].join(" ")}
 				onChange={async (files) => {
-					const file = files?.[0];
-					if (file) {
-						void add(new File([file], file.name, { type: file.type }));
+					for (const file of files) {
+						await add(file);
 					}
 				}}
 			>
-				<Icon icon="plus-circle" height={16} width={16} title="Add File" />
+				<Icon
+					icon="plus-circle"
+					height={16}
+					width={16}
+					title="Add File"
+					decorative
+				/>
 				<span>Add</span>
 			</ButtonFile>
 			{props.children}

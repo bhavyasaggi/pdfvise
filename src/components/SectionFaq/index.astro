@@ -1,0 +1,47 @@
+---
+interface Item {
+	question: string;
+	answer: string;
+}
+
+interface Props {
+	items: Item[];
+	intro?: string;
+}
+
+const { items, intro } = Astro.props;
+const schema = {
+	"@context": "https://schema.org",
+	"@type": "FAQPage",
+	mainEntity: items.map((item) => ({
+		"@type": "Question",
+		name: item.question,
+		acceptedAnswer: {
+			"@type": "Answer",
+			text: item.answer,
+		},
+	})),
+};
+const json = JSON.stringify(schema).replaceAll("<", "\\u003c");
+---
+
+<section class="container" aria-labelledby="faq-heading">
+  <h2 id="faq-heading" style="text-align: center; color: var(--pico-primary);">
+    Frequently Asked Questions
+  </h2>
+  {intro ? <p>{intro}</p> : null}
+  {
+    items.map((item, index) => (
+      <div>
+        <details open>
+          <summary>
+            <strong>{item.question}</strong>
+          </summary>
+          <p>{item.answer}</p>
+        </details>
+        {index < items.length - 1 ? <hr /> : null}
+      </div>
+    ))
+  }
+</section>
+<script type="application/ld+json" is:inline set:html={json} />

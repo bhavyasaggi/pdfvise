@@ -20,8 +20,7 @@ export default class SuspenseErrorBoundary extends React.Component<
 
 	override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
 		// You can also log the error to an error reporting service
-		console.error(error);
-		console.info(errorInfo);
+		console.error(error, errorInfo);
 	}
 
 	render() {

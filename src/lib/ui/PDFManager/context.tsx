@@ -1,10 +1,11 @@
-import { createContext } from "react";
+import { createContext, type Dispatch, type SetStateAction } from "react";
+
 import type { pdfjs, pdflib } from "@/lib/utils/pdf";
+
 import type { PDFManagerMetaType, PDFPageDataType } from "./types";
 
 const noop = () => {};
-const noopPromise = <T = unknown>(..._args: unknown[]) =>
-	Promise.resolve(null as T);
+const noopPromise = <T,>(..._args: unknown[]) => Promise.resolve(null as T);
 
 export const PDFManagerValueContext = createContext<PDFManagerMetaType>({
 	mode: "default",
@@ -12,9 +13,10 @@ export const PDFManagerValueContext = createContext<PDFManagerMetaType>({
 	isUninitialized: true,
 	isLoading: false,
 	error: undefined,
+	notice: undefined,
 });
 
-export const PDFManagerActionContext = createContext<{
+export type PDFManagerActions = {
 	add: (file: File) => Promise<void>;
 	remove: (fileOrId: File | string) => void;
 	get: (fileOrId: File | string) =>
@@ -24,12 +26,13 @@ export const PDFManagerActionContext = createContext<{
 				pdfDocumentProxy: pdfjs.PDFDocumentProxy;
 		  }
 		| undefined;
-	setMeta: React.Dispatch<React.SetStateAction<PDFManagerMetaType>>;
+	setMeta: Dispatch<SetStateAction<PDFManagerMetaType>>;
 	extractThumbnail: (
 		data: Pick<PDFPageDataType, "id" | "index">,
 		options?: {
 			maxDimension?: number;
 			quality?: number;
+			rotation?: number;
 		},
 	) => Promise<Blob | null>;
 	extractImage: (
@@ -40,11 +43,15 @@ export const PDFManagerActionContext = createContext<{
 			imageIndex?: number;
 		},
 	) => Promise<Blob | null>;
-}>({
+	extractText: (data: Pick<PDFPageDataType, "id" | "index">) => Promise<string>;
+};
+
+export const PDFManagerActionContext = createContext<PDFManagerActions>({
 	add: noopPromise,
 	remove: noop,
 	get: () => undefined,
 	setMeta: noop,
 	extractThumbnail: noopPromise,
 	extractImage: noopPromise,
+	extractText: noopPromise,
 });

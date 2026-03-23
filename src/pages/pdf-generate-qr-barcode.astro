@@ -1,0 +1,22 @@
+---
+import PageComingSoon from "@/components/PageComingSoon/index.astro";
+import SectionRibbon from "@/components/SectionRibbon/index.astro";
+import BaseLayout from "@/layouts/base.astro";
+
+Astro.response.status = 503;
+Astro.response.statusText = "Service Unavailable";
+---
+
+<BaseLayout
+  title="QR and barcode PDFs | PDFvise"
+  description="QR and barcode PDFs are not available in this version of PDFvise. Files are not uploaded."
+  noindex
+>
+  <SectionRibbon
+    title="QR and barcode PDFs"
+    description="This generator is not available yet."
+  />
+  <PageComingSoon
+    note="PDFvise does not draw QR codes or barcodes in this version, so this page stays offline rather than producing a code that would not scan."
+  />
+</BaseLayout>

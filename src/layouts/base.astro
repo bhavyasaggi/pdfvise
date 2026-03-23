@@ -5,20 +5,122 @@ import Image from "astro/components/Image.astro";
 interface Props {
 	title?: string;
 	description?: string;
+	noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { noindex = false } = Astro.props;
+const title = Astro.props.title || "PDFvise";
+const description =
+	Astro.props.description ||
+	"PDFvise edits PDF files in the browser. Files are not uploaded.";
+const year = new Date().getFullYear();
+const canonical = Astro.site
+	? new URL(Astro.url.pathname, Astro.site).href
+	: Astro.url.href;
+const origin = Astro.site
+	? Astro.site.href.replace(/\/$/, "")
+	: Astro.url.origin;
+const image = new URL("/android-chrome-512x512.png", canonical).href;
+const crumb = title.replace(/\s*\|\s*PDFvise\s*$/u, "");
+const graph = {
+	"@context": "https://schema.org",
+	"@graph": [
+		{
+			"@type": "Organization",
+			"@id": `${origin}/#organization`,
+			name: "PDFvise",
+			url: `${origin}/`,
+			email: "bhavya.saggi@gmail.com",
+			logo: image,
+		},
+		{
+			"@type": "WebSite",
+			"@id": `${origin}/#website`,
+			name: "PDFvise",
+			url: `${origin}/`,
+			publisher: { "@id": `${origin}/#organization` },
+		},
+		{
+			"@type": "WebApplication",
+			"@id": `${canonical}#app`,
+			name: "PDFvise",
+			url: canonical,
+			applicationCategory: "BusinessApplication",
+			operatingSystem: "Web",
+			browserRequirements: "Requires a current browser.",
+			description,
+			offers: {
+				"@type": "Offer",
+				price: "0",
+				priceCurrency: "USD",
+			},
+			provider: { "@id": `${origin}/#organization` },
+		},
+		{
+			"@type": "BreadcrumbList",
+			itemListElement:
+				Astro.url.pathname === "/"
+					? [
+							{
+								"@type": "ListItem",
+								position: 1,
+								name: "Home",
+								item: `${origin}/`,
+							},
+						]
+					: [
+							{
+								"@type": "ListItem",
+								position: 1,
+								name: "Home",
+								item: `${origin}/`,
+							},
+							{
+								"@type": "ListItem",
+								position: 2,
+								name: crumb,
+								item: canonical,
+							},
+						],
+		},
+	],
+};
+const jsonLd = JSON.stringify(graph).replaceAll("<", "\\u003c");
 ---
 
 <html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title || "PDFvise"}</title>
-    <meta name="description" content={description || ""} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#da2f47" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta
+      name="robots"
+      content={noindex ? "noindex, nofollow" : "index, follow"}
+    />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="PDFvise" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    <script type="application/ld+json" is:inline set:html={jsonLd} />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
   </head>
   <body>
+    <a class="skip-link" href="#content">Skip to content</a>
     <header>
       <div class="container" style="display: flex; flex-wrap: nowrap;">
         <a href="/" aria-label="Home" style="display: flex;">
@@ -32,7 +134,7 @@ const { title, description } = Astro.props;
         >
       </div>
     </header>
-    <main style="min-height: 100dvh; background-color: #fefbf8;">
+    <main id="content" tabindex="-1" style="min-height: 100dvh; background-color: #fefbf8;">
       <slot />
     </main>
     <footer style="padding: calc(2 * var(--pico-spacing)) 0; ">
@@ -50,7 +152,7 @@ const { title, description } = Astro.props;
           />
           <br />
           <small>
-            © 20XX PDFvise. All rights reserved.
+            © {year} PDFvise. All rights reserved.
             <br />
             This software is licensed under the{" "}
             <a

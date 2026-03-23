@@ -1,140 +1,87 @@
 import { degrees, type Rotation } from "pdf-lib";
 
-type LayoutOptionsType = {
+export type LayoutSlot = {
 	pageNumber: number;
 	x: number;
 	y: number;
-	height: number;
 	width: number;
+	height: number;
 	rotate?: Rotation;
 };
 
-// TODO: Adjust x, y, width, height based on rotation (along bottom-left corner)
-export function* zinePDFLayout(
+type SlotSeed = {
+	xFactor: number;
+	yFactor: number;
+	rotate?: Rotation;
+};
+
+/**
+ * Slots are bottom-left corners in an upright sheet.
+ * A 180 degree seed is rotated around the drawn page's bottom-left by the
+ * impose step, which parks it in the quadrant described here.
+ *
+ * Zine:
+ * [Page 1 inverted] [Page 4 inverted]
+ * [Page 2         ] [Page 3         ]
+ *
+ * N-up:
+ * [Page 1] [Page 2]
+ * [Page 3] [Page 4]
+ */
+const ZINE_SEEDS: readonly SlotSeed[] = [
+	{ xFactor: 0, yFactor: 1, rotate: degrees(180) },
+	{ xFactor: 0, yFactor: 0 },
+	{ xFactor: 1, yFactor: 0 },
+	{ xFactor: 1, yFactor: 1, rotate: degrees(180) },
+];
+
+const NUP_SEEDS: readonly SlotSeed[] = [
+	{ xFactor: 0, yFactor: 1 },
+	{ xFactor: 1, yFactor: 1 },
+	{ xFactor: 0, yFactor: 0 },
+	{ xFactor: 1, yFactor: 0 },
+];
+
+function* tiledLayout(
 	pageWidth: number,
 	pageHeight: number,
-): Generator<LayoutOptionsType, void, unknown> {
-	/*
-	 * [Page 1 INV] [Page 4 INV]
-	 * [Page 2    ] [Page 3    ]
-	 */
-	let sectionCount = -1;
+	seeds: readonly SlotSeed[],
+): Generator<LayoutSlot> {
+	const slotWidth = pageWidth / 2;
+	const slotHeight = pageHeight / 2;
+	let sectionCount = 0;
 	while (true) {
+		const seed = seeds[sectionCount % seeds.length];
+		const pageNumber = Math.floor(sectionCount / seeds.length) + 1;
 		sectionCount += 1;
-		const sectionPage = Math.floor(sectionCount / 4);
-		const sectionMod = sectionCount % 4;
-		switch (sectionMod) {
-			case 0:
-				yield {
-					pageNumber: sectionPage + 1,
-					x: pageWidth / 2,
-					y: pageHeight,
-					width: pageWidth / 2,
-					height: pageHeight / 2,
-					rotate: degrees(180),
-				};
-				break;
-			case 1:
-				yield {
-					pageNumber: sectionPage + 1,
-					x: 0,
-					y: 0,
-					width: pageWidth / 2,
-					height: pageHeight / 2,
-				};
-				break;
-			case 2:
-				yield {
-					pageNumber: sectionPage + 1,
-					x: pageWidth / 2,
-					y: 0,
-					width: pageWidth / 2,
-					height: pageHeight / 2,
-				};
-				break;
-			case 3:
-				yield {
-					pageNumber: sectionPage + 1,
-					x: pageWidth,
-					y: pageHeight,
-					width: pageWidth / 2,
-					height: pageHeight / 2,
-					rotate: degrees(180),
-				};
-				break;
-			default:
-				throw new Error("Not implemented");
+		if (!seed) {
+			throw new Error("Layout seed is missing.");
 		}
-	}
-}
-
-// TODO: Adjust x, y, width, height based on rotation (along bottom-left corner)
-export function* nupPDFLayout(
-	pageWidth: number,
-	pageHeight: number,
-): Generator<LayoutOptionsType> {
-	/*
-	 * [Page 1] [Page 2]
-	 * [Page 3] [Page 4]
-	 */
-	let sectionCount = -1;
-	while (true) {
-		sectionCount += 1;
-		const sectionPage = Math.floor(sectionCount / 4);
-		const sectionMod = sectionCount % 4;
-		switch (sectionMod) {
-			case 0:
-				yield {
-					pageNumber: sectionPage + 1,
-					x: 0,
-					y: pageHeight / 2,
-					width: pageWidth / 2,
-					height: pageHeight / 2,
-				};
-				break;
-			case 1:
-				yield {
-					pageNumber: sectionPage + 1,
-					x: pageWidth / 2,
-					y: pageHeight / 2,
-					width: pageWidth / 2,
-					height: pageHeight / 2,
-				};
-				break;
-			case 2:
-				yield {
-					pageNumber: sectionPage + 1,
-					x: 0,
-					y: 0,
-					width: pageWidth / 2,
-					height: pageHeight / 2,
-				};
-				break;
-			case 3:
-				yield {
-					pageNumber: sectionPage + 1,
-					x: pageWidth / 2,
-					y: 0,
-					width: pageWidth / 2,
-					height: pageHeight / 2,
-				};
-				break;
-			default:
-				throw new Error("Not implemented");
-		}
-	}
-}
-
-export function* standardPDFLayout(): Generator<
-	LayoutOptionsType,
-	void,
-	unknown
-> {
-	let sectionCount = -1;
-	while (true) {
-		sectionCount += 1;
 		yield {
-			pageNumber: sectionCount + 1,
+			pageNumber,
+			x: seed.xFactor * slotWidth,
+			y: seed.yFactor * slotHeight,
+			width: slotWidth,
+			height: slotHeight,
+			...(seed.rotate ? { rotate: seed.rotate } : {}),
+		};
+	}
+}
+
+export function zinePDFLayout(pageWidth: number, pageHeight: number) {
+	return tiledLayout(pageWidth, pageHeight, ZINE_SEEDS);
+}
+
+export function nupPDFLayout(pageWidth: number, pageHeight: number) {
+	return tiledLayout(pageWidth, pageHeight, NUP_SEEDS);
+}
+
+export function* standardPDFLayout(): Generator<LayoutSlot> {
+	let pageNumber = 0;
+	while (true) {
+		pageNumber += 1;
+		yield {
+			pageNumber,
 			x: 0,
 			y: 0,
 			width: 0,
@@ -144,22 +91,17 @@ export function* standardPDFLayout(): Generator<
 }
 
 export default function PDFLayoutFactory(options: {
-	layout?: "4-zine" | "4-n-up" | string;
+	layout?: "4-zine" | "4-n-up" | "1-n-up" | string;
 	pageWidth?: number;
 	pageHeight?: number;
-}): Generator<LayoutOptionsType, void, unknown> {
-	switch (options?.layout) {
-		case "4-zine":
-			if (!options.pageHeight || !options.pageWidth) {
-				throw new Error("Page dimensions are required for 4-zine layout");
-			}
-			return zinePDFLayout(options.pageWidth, options.pageHeight);
-		case "4-n-up":
-			if (!options.pageHeight || !options.pageWidth) {
-				throw new Error("Page dimensions are required for 4-n-up layout");
-			}
-			return nupPDFLayout(options.pageWidth, options.pageHeight);
-		default:
-			return standardPDFLayout();
+}): Generator<LayoutSlot> {
+	if (options.layout === "4-zine" || options.layout === "4-n-up") {
+		if (!options.pageWidth || !options.pageHeight) {
+			throw new Error("Page dimensions are required for this layout.");
+		}
+		return options.layout === "4-zine"
+			? zinePDFLayout(options.pageWidth, options.pageHeight)
+			: nupPDFLayout(options.pageWidth, options.pageHeight);
 	}
+	return standardPDFLayout();
 }

@@ -6,7 +6,8 @@
 		"useIgnoreFile": true
 	},
 	"files": {
-		"ignoreUnknown": false
+		"ignoreUnknown": false,
+		"includes": ["**", "!dist", "!node_modules", "!coverage", "!logo.psd"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -20,24 +21,38 @@
 				"useExhaustiveDependencies": "error",
 				"useHookAtTopLevel": "error",
 				"noUnusedVariables": "error",
-				"noUnusedImports": "error"
+				"noUnusedImports": "error",
+				"noUnusedFunctionParameters": "error"
 			},
 			"suspicious": {
-				"noConsole": "warn",
+				"noConsole": {
+					"level": "warn",
+					"options": {
+						"allow": ["error", "warn"]
+					}
+				},
 				"noDebugger": "error",
 				"noDoubleEquals": "error",
-				"noExplicitAny": "error"
+				"noExplicitAny": "error",
+				"noImplicitAnyLet": "error"
 			},
 			"style": {
 				"useConst": "error",
 				"useImportType": "error",
-				"useTemplate": "error"
+				"useTemplate": "error",
+				"useBlockStatements": "error",
+				"noUselessElse": "error"
 			},
 			"security": {
 				"noDangerouslySetInnerHtml": "error"
 			},
 			"complexity": {
-				"noExcessiveCognitiveComplexity": "warn"
+				"noExcessiveCognitiveComplexity": {
+					"level": "warn",
+					"options": {
+						"maxAllowedComplexity": 20
+					}
+				}
 			},
 			"a11y": {
 				"recommended": true,
@@ -46,7 +61,8 @@
 				"useKeyWithClickEvents": "error",
 				"useValidAnchor": "error",
 				"useValidAriaProps": "error",
-				"useValidAriaRole": "error"
+				"useValidAriaRole": "error",
+				"noSvgWithoutTitle": "error"
 			},
 			"performance": {
 				"recommended": true
@@ -73,11 +89,13 @@
 				"rules": {
 					"style": {
 						"useConst": "off",
-						"useImportType": "off"
+						"useImportType": "off",
+						"useBlockStatements": "off"
 					},
 					"correctness": {
 						"noUnusedVariables": "off",
-						"noUnusedImports": "off"
+						"noUnusedImports": "off",
+						"noUnusedFunctionParameters": "off"
 					}
 				}
 			}

@@ -1,0 +1,9 @@
+/* TEAM */
+Developer: Bhavya Saggi
+Contact: bhavya.saggi@gmail.com
+Site: https://pdfvise.com
+
+/* SITE */
+Language: English
+Standards: HTML, CSS
+Software: Astro, Preact, pdf-lib

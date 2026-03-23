@@ -1,43 +1,35 @@
-import type { pdfjs, pdflib } from "@/lib/utils/pdf";
+import type { pdfjs } from "@/lib/utils/pdf";
+import {
+	cropInsetsFromBoxes,
+	normalizeQuarterTurn,
+} from "@/lib/utils/pdf-geometry";
 
 import type { PDFManagerStoreType, PDFPageDataType } from "./types";
 
-export const getPageMeta = (page: pdflib.PDFPage) => {
-	const itemSize = page.getSize();
-	const itemCropBox = page.getCropBox();
-	const itemPosition = page.getPosition();
-	const itemRotation = page.getRotation();
-
+export function getPageMeta(page: import("pdf-lib").PDFPage) {
+	const media = page.getMediaBox();
+	const crop = page.getCropBox();
+	const insets = cropInsetsFromBoxes(media, crop);
 	return {
-		height: itemSize.height,
-		width: itemSize.width,
-		cropTop: itemSize.height - itemCropBox.y,
-		cropLeft: itemCropBox.x,
-		cropBottom: itemCropBox.y,
-		cropRight: itemSize.width - itemCropBox.x,
-		positionBottom: itemPosition.y,
-		positionLeft: itemPosition.x,
-		rotation:
-			itemRotation.type === "degrees"
-				? itemRotation.angle
-				: (itemRotation.angle * 180) / Math.PI,
+		width: media.width,
+		height: media.height,
+		...insets,
+		rotation: normalizeQuarterTurn(page.getRotation().angle),
 	};
-};
+}
 
-export const getPDFManagerMeta = async (
+export async function getPDFManagerMeta(
 	initStore?: PDFManagerStoreType,
 	options?: {
 		mode?: "default" | "firstPageOnly" | "imagesOnly" | "textOnly";
 	},
-): Promise<PDFPageDataType[]> => {
-	const optionsMode = options?.mode;
+): Promise<PDFPageDataType[]> {
 	if (!initStore) {
 		return [];
 	}
 
-	const imagesOnly = optionsMode === "imagesOnly";
-	if (imagesOnly) {
-		// TODO: implement images only mode meta format
+	const optionsMode = options?.mode ?? "default";
+	if (optionsMode === "imagesOnly") {
 		const { extractPDFEmbedImages } = await import("@/lib/utils/pdf");
 		const returnData: PDFPageDataType[] = [];
 		for (const [id, item] of Object.entries(initStore)) {
@@ -62,14 +54,9 @@ export const getPDFManagerMeta = async (
 		return returnData;
 	}
 
-	const textOnly = optionsMode === "textOnly";
-	if (textOnly) {
-		throw new Error("Unsupported mode");
-	}
-
 	const firstPageOnly = optionsMode === "firstPageOnly";
 	return Object.entries(initStore).flatMap(([id, item]) => {
-		return (item.pdfDocument as pdflib.PDFDocument)
+		return item.pdfDocument
 			.getPages()
 			.slice(0, firstPageOnly ? 1 : undefined)
 			.map((localPage, index) => ({
@@ -78,4 +65,4 @@ export const getPDFManagerMeta = async (
 				...getPageMeta(localPage),
 			}));
 	});
-};
+}

@@ -1,4 +1,5 @@
 ---
+import SectionFaq from "@/components/SectionFaq/index.astro";
 import SectionHowTo from "@/components/SectionHowTo/index.astro";
 import SectionPDFPagesLazy from "@/components/SectionPDFPages/lazy";
 import SectionRibbon from "@/components/SectionRibbon/index.astro";
@@ -7,7 +8,7 @@ import BaseLayout from "@/layouts/base.astro";
 
 <BaseLayout
   title="Remove PDF Annotation online for free. | PDFvise"
-  description="Remove PDF Annotation online without uploading, with no watermarks, & completely free! Remove PDF files easily on your browser only!."
+  description="Remove PDF annotations online without uploading, with no watermarks, and completely free. Drop comments and links in your browser."
 >
   <SectionRibbon
     title="Remove PDF Annotation"
@@ -18,11 +19,11 @@ import BaseLayout from "@/layouts/base.astro";
     style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
   >
     <div style="margin-bottom: calc(3 * var(--pico-spacing));">
-      <SectionPDFPagesLazy client:load />
+      <SectionPDFPagesLazy tool="remove-annotation" client:load />
     </div>
     <SectionHowTo
       title="How to Remove Annotation of PDF files?"
-      description="Remove PDF Annotation online without uploading, with no watermarks, & completely free! Remove PDF files easily on your browser only!."
+      description="Drop comments, links, and other annotations in your browser. The page content stays."
     >
       <ol>
         <li>Select all PDF files</li>
@@ -30,21 +31,10 @@ import BaseLayout from "@/layouts/base.astro";
         <li>Save & Download</li>
       </ol>
     </SectionHowTo>
-    <section class="container">
-      <h2 style="text-align: center; color: var(--pico-primary);">
-        Frequently Asked Questions
-      </h2>
-      <details open>
-        <summary>
-          <strong
-            >Can I Rotate a PDF while removing annotation of a PDF file?
-          </strong>
-        </summary>
-        <p>
-          After selecting a PDF file on PDFvise, you can choose to rotate the
-          file by 90°, 180°, or 270°.
-        </p>
-      </details>
-    </section>
+    <SectionFaq
+  items={[
+    { question: "Can I Rotate a PDF while removing annotation of a PDF file?", answer: "After selecting a PDF file on PDFvise, you can choose to rotate the file by 90°, 180°, or 270°." },
+  ]}
+/>
   </div>
 </BaseLayout>

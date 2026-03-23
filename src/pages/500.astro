@@ -1,8 +1,27 @@
 ---
-import PageNotFound from "@/components/PageNotFound/index.astro";
+import Image from "astro/components/Image.astro";
+import ASSET_500 from "@/assets/500.svg?url";
 import BaseLayout from "@/layouts/base.astro";
 ---
 
-<BaseLayout>
-  <PageNotFound />
+<BaseLayout
+  title="Something went wrong | PDFvise"
+  description="PDFvise could not finish loading this page."
+  noindex
+>
+  <section class="container" style="padding: calc(3 * var(--pico-spacing)) 0;">
+    <div style="text-align: center;">
+      <h1 style={{ color: "var(--pico-primary)" }}>Something went wrong</h1>
+      <a href="/">Back to PDFvise</a>
+      <br />
+      <Image
+        loading="eager"
+        src={ASSET_500}
+        alt=""
+        height={200}
+        width={248}
+        style="margin: calc(2 * var(--pico-spacing)) 0;"
+      />
+    </div>
+  </section>
 </BaseLayout>

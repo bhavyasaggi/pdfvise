@@ -250,6 +250,21 @@ progress,
   accent-color: var(--pico-primary);
 }
 
+.skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: 0.5rem;
+  z-index: 2;
+  transform: translateY(-200%);
+  padding: 0.5rem 1rem;
+  background: var(--pico-background-color);
+  color: var(--pico-color);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
 body {
   width: 100%;
   margin: 0;
@@ -257,7 +272,7 @@ body {
   &>main,
   &>header,
   &>footer {
-    overflow: hidden;
+    overflow-x: clip;
   }
 
   &>header,

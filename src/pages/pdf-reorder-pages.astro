@@ -1,4 +1,5 @@
 ---
+import SectionFaq from "@/components/SectionFaq/index.astro";
 import SectionHowTo from "@/components/SectionHowTo/index.astro";
 import SectionPDFMetaLazy from "@/components/SectionPDFMeta/lazy";
 import SectionRibbon from "@/components/SectionRibbon/index.astro";
@@ -18,7 +19,7 @@ import BaseLayout from "@/layouts/base.astro";
     style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
   >
     <div style="margin-bottom: calc(3 * var(--pico-spacing));">
-      <SectionPDFMetaLazy client:load />
+      <SectionPDFMetaLazy tool="reorder" client:load />
     </div>
     <SectionHowTo
       title="How to sort and organize pages of a PDF file in any order?"
@@ -30,21 +31,10 @@ import BaseLayout from "@/layouts/base.astro";
         <li>Save & Download</li>
       </ol>
     </SectionHowTo>
-    <section class="container">
-      <h2 style="text-align: center; color: var(--pico-primary);">
-        Frequently Asked Questions
-      </h2>
-      <details open>
-        <summary>
-          <strong>
-            Can I Rotate a PDF while reordering pages of a PDF file?
-          </strong>
-        </summary>
-        <p>
-          After selecting a PDF file on PDFvise, you can choose to rotate the
-          file by 90°, 180°, or 270°.
-        </p>
-      </details>
-    </section>
+    <SectionFaq
+  items={[
+    { question: "Can I Rotate a PDF while reordering pages of a PDF file?", answer: "After selecting a PDF file on PDFvise, you can choose to rotate the file by 90°, 180°, or 270°." },
+  ]}
+/>
   </div>
 </BaseLayout>

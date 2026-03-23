@@ -1,4 +1,5 @@
 ---
+import SectionFaq from "@/components/SectionFaq/index.astro";
 import SectionHowTo from "@/components/SectionHowTo/index.astro";
 import SectionPDFExtractImagesLazy from "@/components/SectionPDFExtractImages/lazy";
 import SectionRibbon from "@/components/SectionRibbon/index.astro";
@@ -30,19 +31,10 @@ import BaseLayout from "@/layouts/base.astro";
         <li>Save & Download ZIP</li>
       </ol>
     </SectionHowTo>
-    <section class="container">
-      <h2 style="text-align: center; color: var(--pico-primary);">
-        Frequently Asked Questions
-      </h2>
-      <details open>
-        <summary>
-          <strong>Can I extract images from multiple PDF files at once?</strong>
-        </summary>
-        <p>
-          Yes, you can upload multiple PDF files, and PDFvise will extract images
-          from all of them and bundle them into a single ZIP file.
-        </p>
-      </details>
-    </section>
+    <SectionFaq
+  items={[
+    { question: "Can I extract images from multiple PDF files at once?", answer: "Yes. Add more than one PDF, and PDFvise extracts the embedded images from all of them into a single ZIP file. A PDF with no embedded images is reported instead of an empty download." },
+  ]}
+/>
   </div>
 </BaseLayout>

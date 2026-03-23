@@ -1,4 +1,4 @@
-import type { HTMLInputTypeAttribute } from "react";
+import type { CSSProperties, HTMLInputTypeAttribute } from "preact";
 
 export default function Input(props: {
 	id?: string;
@@ -8,10 +8,11 @@ export default function Input(props: {
 	min?: string;
 	max?: string;
 	label?: string;
+	ariaLabel?: string;
 	defaultValue?: string;
 	onChange?: (value: string) => void;
 	className?: string;
-	style?: React.CSSProperties;
+	style?: CSSProperties;
 }) {
 	if (!props.label) {
 		return (
@@ -22,8 +23,13 @@ export default function Input(props: {
 				step={props.step}
 				min={props.min}
 				max={props.max}
+				aria-label={props.ariaLabel}
 				defaultValue={props.defaultValue}
-				onChange={(e) => props.onChange?.(e.target.value)}
+				onChange={(event) => {
+					if (event.currentTarget instanceof HTMLInputElement) {
+						props.onChange?.(event.currentTarget.value);
+					}
+				}}
 				className={props.className}
 				style={props.style}
 			/>
@@ -41,7 +47,11 @@ export default function Input(props: {
 				min={props.min}
 				max={props.max}
 				defaultValue={props.defaultValue}
-				onChange={(e) => props.onChange?.(e.target.value)}
+				onChange={(event) => {
+					if (event.currentTarget instanceof HTMLInputElement) {
+						props.onChange?.(event.currentTarget.value);
+					}
+				}}
 			/>
 		</label>
 	);

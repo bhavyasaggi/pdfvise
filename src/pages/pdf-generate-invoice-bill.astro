@@ -1,22 +1,39 @@
 ---
-// https://www.bannerbear.com/generators/free-online-invoice-generator/
-// https://www.billgenerator.in/
-
-import PageComingSoon from "@/components/PageComingSoon/index.astro";
+import SectionFaq from "@/components/SectionFaq/index.astro";
+import SectionGenerateLazy from "@/components/SectionGenerate/lazy";
+import SectionHowTo from "@/components/SectionHowTo/index.astro";
 import SectionRibbon from "@/components/SectionRibbon/index.astro";
 import BaseLayout from "@/layouts/base.astro";
-
-Astro.response.status = 503;
-Astro.response.statusText = "Service Unavailable";
 ---
 
 <BaseLayout
-  title="PDF files online for free. | PDFvise"
-  description="PDF file online without uploading, with no watermarks, & completely free! PDF files easily on your browser only!"
+  title="Create an invoice PDF online for free. | PDFvise"
+  description="Create an invoice PDF online without uploading, with no watermarks, and completely free. The PDF is built in your browser."
 >
   <SectionRibbon
-    title="PDF"
-    description="PDF file."
+    title="Invoice"
+    description="Fill in the bill and download a PDF."
   />
-  <PageComingSoon />
+  <div
+    class="container"
+    style="display: flex; flex-direction: column; margin-top: calc(2 * var(--pico-spacing)); margin-bottom: calc(2 * var(--pico-spacing)); gap: calc(2 * var(--pico-spacing));"
+  >
+    <div style="margin-bottom: calc(3 * var(--pico-spacing));">
+      <SectionGenerateLazy kind="invoice" client:load />
+    </div>
+    <SectionHowTo
+      title="How to create an invoice?"
+      description="Create an invoice PDF in your browser. Nothing is uploaded."
+    >
+      <ol>
+        <li>Enter the sender, the client, and one item per line</li>
+        <li>Save & Download</li>
+      </ol>
+    </SectionHowTo>
+    <SectionFaq
+  items={[
+    { question: "How do I enter line items?", answer: "Each line is description, quantity, rate. A line with one comma uses quantity 1." },
+  ]}
+/>
+  </div>
 </BaseLayout>
